@@ -17,7 +17,7 @@ https://ovenapp.io/project/LCIwrbnicj7c5JYIbRHNqO8fhQkGhNKa#RXKJ3
 
 
 
-화면 구성 및 디비 
+화면 구성 및 디비 스키마    
 1.	화면1
 
 @TODO
