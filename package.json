@@ -1,0 +1,26 @@
+{
+  "name": "seoulappcontest",
+  "version": "1.0.0",
+  "description": "server-side",
+  "main": "index.js",
+  "scripts": {
+    "debug": "set NODE_ENV=development&&set DEBUG=app:*&&nodemon src",
+    "dev": "set NODE_ENV=development&&nodemon src",
+    "start": "set NODE_ENV=production&&nodemon src",
+    "lint": "eslint src",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Junghoon Park",
+  "license": "ISC",
+  "dependencies": {
+    "eslint": "^4.19.1",
+    "mongoose": "^5.1.5",
+    "underscore": "^1.9.1",
+    "express": "^4.16.3",
+    "helmet": "^3.12.1",
+    "morgan": "^1.9.0",
+    "config": "^1.30.0",
+    "debug": "^3.1.0",
+    "mongodb": "^3.0.10"
+  }
+}
