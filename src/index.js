@@ -7,6 +7,7 @@ const morgan = require('morgan')
 const config = require('config')
 const debug = require('debug')('app:startup')
 const login = require('./routes/login')
+const mongoose = require('mongoose')
 
 app = express()
 
@@ -25,6 +26,10 @@ app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
 app.use('/api/login', login)
 // app.use(logger)
+
+mongoose.connect(init.mongoUrl)
+.then(() => console.log('Connected to MongoDB...'))
+.catch(err => console.error(('Could not connect to MongoDB...'), err))
 
 app.get('/', (req, res) => {
   res.send("test")
