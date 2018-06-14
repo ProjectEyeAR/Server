@@ -6,8 +6,8 @@ const helmet = require('helmet')
 const morgan = require('morgan')
 const config = require('config')
 const debug = require('debug')('app:startup')
-const login = require('./routes/login')
 const mongoose = require('mongoose')
+const routes = require('./routes')
 
 app = express()
 
@@ -24,12 +24,9 @@ app.use(helmet())
 app.disable('x-powered-by')
 app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
-app.use('/api/login', login)
-// app.use(logger)
+//localhost:3000/api
+app.use('/api', routes)
 
-mongoose.connect(init.mongoUrl)
-.then(() => console.log('Connected to MongoDB...'))
-.catch(err => console.error(('Could not connect to MongoDB...'), err))
 
 app.get('/', (req, res) => {
   res.send("test")
