@@ -9,7 +9,7 @@ const debug = require('debug')('app:startup')
 const mongoose = require('mongoose')
 const routes = require('./routes')
 
-app = express()
+const app = express()
 
 console.log('Applicatoin Name:' + config.get('name'))
 console.log(`NODE_ENV: ${process.env.NODE_ENV}`)
