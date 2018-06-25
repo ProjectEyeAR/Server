@@ -1,4 +1,4 @@
-const mongoose = reuqire('mongoose')
+const mongoose = require('mongoose')
 
 const memoSchema = new mongoose.Schema({
   img: {
@@ -11,10 +11,7 @@ const memoSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  geometry: {
-    type: String,
-    coordinates: [ Number ]
-  }
+  coordinates: [Number]
 })
 
 module.exports = mongoose.model('Memo', memoSchema)

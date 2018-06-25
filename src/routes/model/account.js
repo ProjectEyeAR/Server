@@ -1,8 +1,14 @@
 const mongoose = require('mongoose')
 
-let accountSchema = new mongoose.Schema({
-  id: String,
-  passward: String,
+const accountSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true
+  },
+  passward: {
+    type: String,
+    required: true
+  },
   date: {
     type: Date,
     default: Date.now

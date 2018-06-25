@@ -7,8 +7,8 @@ const init = require('../config')
 module.exports = ({ init, db }) => {
   let api = express()
 
-  api.get('/', (req, res) => {
-    let memos = Memo.find().sort('date')
+  api.get('/', async (req, res) => {
+    let memos = await Memo.find().sort('date')
     res.send(memos)
   })
 
@@ -19,11 +19,12 @@ module.exports = ({ init, db }) => {
   })
 
   api.post('/', async (req, res) => {
-      let Memo = new Memo()
-      Memo.img = req.body.img
-      Memo.text = req.body.text
-      Memo.geometry.coordinates = req.body.geometry.coordinates
-      await Memo.save((err) => {
+      let newMemo = new Memo()
+      newMemo.img = req.body.img
+      newMemo.text = req.body.text
+      newMemo.coordinates = req.body.coordinates
+
+      await newMemo.save((err) => {
         if(err) return res.status(500).json({ message: 'internal error' })
         res.json({ message: '성공적으로 저장' })
       })

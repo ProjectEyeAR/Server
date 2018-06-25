@@ -27,11 +27,6 @@ app.use(express.urlencoded({ extended: true }))
 //localhost:3000/api
 app.use('/api', routes)
 
-
-app.get('/', (req, res) => {
-  res.send("test")
-})
-
 app.listen(init.port, () => {
   console.log(`listening port: " ${init.port}...`)
 })
