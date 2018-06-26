@@ -11,10 +11,24 @@
   1.1. "somthing"</br>
 
 ## 4. 라우터
-
-## 5. 디비 스키마    
-1.	화면1<br>
-  1.1. URL:<br>
-  1.2. 스키마:<br>
-2.	화면2
-3.	화면3
+메모 = AR사진과 글 등이 적혀있음<br>
+GET localhost:3000/api/memo - 모든 메모 가져오기<br>
+POST localhost:3000/api/memo - 메모 저장하기<br>
+## 5. 디비 스키마
+<code>    
+const memoSchema = new mongoose.Schema({
+  img: {
+    type: String
+  },
+  text: {
+    type: String
+  },
+  date: {
+    type: Date,
+    default: Date.now
+  },
+  coordinates: {
+    type: [Number]
+  }
+})
+</code>
