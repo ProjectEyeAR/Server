@@ -11,7 +11,9 @@ const memoSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  coordinates: [Number]
+  coordinates: {
+    type: [Number]
+  }
 })
 
 module.exports = mongoose.model('Memo', memoSchema)

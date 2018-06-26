@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')
 const express = require('express')
 const Memo = require('../routes/model/memo')
-const bodyParser = require('body-parser')
 const init = require('../config')
 
 module.exports = ({ init, db }) => {
@@ -25,7 +24,7 @@ module.exports = ({ init, db }) => {
       newMemo.coordinates = req.body.coordinates
 
       await newMemo.save((err) => {
-        if(err) return res.status(500).json({ message: 'internal error' })
+        if(err) return res.status(500).send(err)
         res.json({ message: '성공적으로 저장' })
       })
   })

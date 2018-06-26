@@ -8,6 +8,7 @@ const config = require('config')
 const debug = require('debug')('app:startup')
 const mongoose = require('mongoose')
 const routes = require('./routes')
+var bodyParser = require('body-parser')
 
 const app = express()
 
@@ -23,7 +24,8 @@ if (app.get('env') === 'development') {
 app.use(helmet())
 app.disable('x-powered-by')
 app.use(express.static('public'))
-app.use(express.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 //localhost:3000/api
 app.use('/api', routes)
 
