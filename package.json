@@ -13,14 +13,22 @@
   "author": "Junghoon Park",
   "license": "ISC",
   "dependencies": {
-    "eslint": "^4.19.1",
-    "mongoose": "^5.1.5",
-    "underscore": "^1.9.1",
-    "express": "^4.16.3",
-    "helmet": "^3.12.1",
-    "morgan": "^1.9.0",
+    "body-parser": "^1.18.3",
     "config": "^1.30.0",
     "debug": "^3.1.0",
-    "mongodb": "^3.0.10"
+    "eslint": "^4.19.1",
+    "express": "^4.16.3",
+    "express-async-errors": "^3.0.0",
+    "express-jwt": "^5.3.1",
+    "helmet": "^3.12.1",
+    "jsonwebtoken": "^8.3.0",
+    "mongodb": "^3.0.10",
+    "mongoose": "^5.1.5",
+    "morgan": "^1.9.0",
+    "passport": "^0.4.0",
+    "passport-facebook": "^2.1.1",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^5.0.1",
+    "underscore": "^1.9.1"
   }
 }
