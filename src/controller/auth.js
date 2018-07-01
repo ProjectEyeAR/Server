@@ -1,14 +1,9 @@
-const mongoose = require('mongoose')
-const express = require('express')
-const User = require('../model/user')
-const bodyParser = require('body-parser')
-const init = require('../config')
-//@passport
-const passport = require('passport')
-const LocalStrategy = require('passport-local').Strategy;
-
 module.exports = ({init, db}) => {
-  const api = express()
+  const User = require('../model/user')
+  //@passport
+  const passport = require('passport')
+  const LocalStrategy = require('passport-local').Strategy;
+  const api = require('express').Router()
 
   api.post('/register', (req, res) => {
     //TODO: 비밀번호 암호화

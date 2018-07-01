@@ -1,14 +1,14 @@
-const express = require('express')
-const init = require('../config')
-const auth = require('../controller/auth')
-const initializeDB = require('../db_connection')
-const memo = require('../controller/memo')
-const router = express()
+module.exports = ({router, init}) => {
+  const auth = require('../controller/auth')
+  const memo = require('../controller/memo')
+  const initializeDB = require('../config/db_connection')
 
-// http://localhost:3001/api/memo
-initializeDB(db => {
-  router.use('/memo', memo({ init, db }))
-  router.use('/auth', auth({ init, db }))
-})
+  initializeDB(db => {
+    //@url http://localhost:3001/api/memo
+    router.use('/memo', memo({init, db}))
+    //@url http://localhost:3001/api/auth
+    router.use('/auth', auth({init, db}))
+  })
 
-module.exports = router
+  return router
+}
