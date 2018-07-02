@@ -7,11 +7,7 @@ module.exports = (app) => {
   const hasher = bkfd2Password();
 
   app.use(passport.initialize())
-  app.use(passport.session({
-    secret: '비밀코드 바꿀것!',
-    resave: false,
-    saveUninitialized: true
-  }))
+  app.use(passport.session())
 
   passport.serializeUser(function(user, done) {
     done(null, user.id);
@@ -33,7 +29,7 @@ module.exports = (app) => {
               console.log('접속한 유저 - ',`username: ${username} password: ${password}`)
               return done(null, user)
             }
-          // return done(null, false, req.flash('loginMessage', {message: 'Incorrect password.', success: false}))
+           return done(null, false, req.flash('error', 'Incorrect password.'))
         })
       });
     }

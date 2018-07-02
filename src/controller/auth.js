@@ -7,7 +7,7 @@ module.exports = ({init, db}) => {
   //@pwd
   const bkfd2Password = require("pbkdf2-password");
   const hasher = bkfd2Password();
-  const {isAuthenticated} = require('../middleware/authenticate')
+  const {checkLoggedIn, checkLoggedOut} = require('../middleware/authenticate')
 
   api.post('/register', (req, res) => {
     let newUser
@@ -32,8 +32,9 @@ module.exports = ({init, db}) => {
     })
   })
 
+  //login 실패시
   api.get('/login', (req, res) => {
-    if (req.flash) return res.status(200).json({ message: req.flash('error')[0], success: false })
+    if (req.flash) return res.status(400).json({ message: req.flash('error')[0], success: false })
   })
 
   api.post('/login', passport.authenticate('local', {
@@ -49,7 +50,7 @@ module.exports = ({init, db}) => {
     res.status(200).json({ message: "성공적으로 로그아웃함", success: true })
   })
 
-  api.get('/me', isAuthenticated, (req, res) => {
+  api.get('/me', checkLoggedIn, (req, res) => {
     res.status(401).json({ message: req.user, success: true })
   })
 
