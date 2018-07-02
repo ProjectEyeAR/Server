@@ -45,6 +45,7 @@ module.exports = ({init, db}) => {
     res.status(200).json({ message: req.user, success: true })
   })
 
+//TODO 로그아웃중복처리
   api.get('/logout', (req, res) => {
     req.logout()
     res.status(200).json({ message: "성공적으로 로그아웃함", success: true })

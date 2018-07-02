@@ -8,6 +8,7 @@ module.exports = ({app, init}) => {
       resave: false,
       rolling: false,
       saveUninitialized: true,
-      store: new MongooseStore({ connection: init.mongoUrl, mongoose: mongoose })
+      store: new MongooseStore({ connection: init.mongoUrl, mongoose: mongoose }),
+      cookie:{ maxAge:60*60*24*30,  httpOnly: true } // 30 days
   }));
 }

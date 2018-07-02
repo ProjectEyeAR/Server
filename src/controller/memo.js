@@ -1,7 +1,7 @@
 module.exports = ({init, db }) => {
   const Memo = require('../model/memo')
   const api = require('express').Router()
-  
+
   api.get('/', async (req, res) => {
     let memos = await Memo.find().sort('date')
     res.status(200).json({ message: memos, success: true })

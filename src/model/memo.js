@@ -1,7 +1,9 @@
 const mongoose = require('mongoose')
+const MemoReview = require('./memo_review')
+const Schema = mongoose.Schema
 
-const memoSchema = new mongoose.Schema({
-  img: {
+const memoSchema = new Schema({
+  ar: {
     type: String
   },
   text: {
@@ -11,8 +13,18 @@ const memoSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  coordinates: {
-    type: [Number]
+  geometry: {
+    coordinates: {
+      type: [Number]
+    }
+  },
+  reviews: [{
+    type: Schema.Types.ObjectId,
+    ref: 'MemoReview'
+  }],
+  date: {
+    type: Date,
+    default: Date.now
   }
 })
 
