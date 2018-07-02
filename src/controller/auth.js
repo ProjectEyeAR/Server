@@ -4,30 +4,43 @@ module.exports = ({init, db}) => {
   const passport = require('passport')
   const LocalStrategy = require('passport-local').Strategy;
   const api = require('express').Router()
+  //@pwd
+  const bkfd2Password = require("pbkdf2-password");
+  const hasher = bkfd2Password();
+  const {isAuthenticated} = require('../middleware/authenticate')
 
   api.post('/register', (req, res) => {
-    //TODO: 비밀번호 암호화
-    let newUser = new User({
-      authId: 'local:' + req.body.email,
-      email: req.body.email,
-      password: req.body.password,
-      displayName: req.body.displayName
+    let newUser
+
+    return hasher({password:req.body.password}, function(err, pass, salt, hash) {
+      if (err) return res.status(500).json({ message: err, success: falst })
+
+      newUser = new User({
+        authId: 'local:' + req.body.email,
+        email: req.body.email,
+        password: hash,
+        salt: salt,
+        displayName: req.body.displayName
+      })
+
+      newUser.save((err, newUser) => {
+        if (err)
+          return res.status(500).json({ message: err, success: false })
+        else
+          return res.status(200).json({ message: newUser, success: true })
+      })
     })
-    console.log(newUser)
-    newUser.save((err, newUser) => {
-      if (err)
-        return res.status(500).json({ message: err, seccess: false })
-      else
-        return res.status(200).json({ message: newUser, success: true })
-    })
+  })
+
+  api.get('/login', (req, res) => {
+    if (req.flash) return res.status(200).json({ message: req.flash('error')[0], success: false })
   })
 
   api.post('/login', passport.authenticate('local', {
     session: true,
-    failureFlash: false,
-    scope: []
+    failureRedirect: '/api/auth/login',
+    failureFlash: true
   }), (req, res) => {
-    //TODO: 로그인 실패시 에러처리
     res.status(200).json({ message: req.user, success: true })
   })
 
@@ -36,10 +49,7 @@ module.exports = ({init, db}) => {
     res.status(200).json({ message: "성공적으로 로그아웃함", success: true })
   })
 
-  api.get('/me', (req, res) => {
-    console.log(req.user)
-    if (!req.user)
-      return res.status(401).json({ message: '허용되지 않은 접근: 로그인이 되었는지 확인', success: false })
+  api.get('/me', isAuthenticated, (req, res) => {
     res.status(401).json({ message: req.user, success: true })
   })
 

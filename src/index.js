@@ -4,7 +4,7 @@ const express = require('express')
 const app = express()
 const router = express.Router()
 const routes = require('./routes')({router, init})
-var bodyParser = require('body-parser')
+const bodyParser = require('body-parser')
 //@development
 const dev = require('./config/development')
 //@security
@@ -14,7 +14,11 @@ require('express-async-errors')
 const session = require('./config/session')({app, init})
 //@passport
 const passport = require('./config/passport')(app)
+const flash = require('connect-flash');
+const cookieParser = require('cookie-parser');
 
+app.use(cookieParser());
+app.use(flash());
 app.disable('x-powered-by')
 app.use(helmet())
 app.use(express.static('public'))

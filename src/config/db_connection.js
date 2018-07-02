@@ -6,5 +6,5 @@ module.exports = (callback) => {
   .then(() => console.log('Connected to MongoDB...'))
   .catch(err => console.error(('Could not connect to MongoDB...\n'), err))
 
-  callback(db)
+  return callback(db)
 }
