@@ -3,7 +3,7 @@ const MemoReview = require('./memo_review')
 const Schema = mongoose.Schema
 
 const memoSchema = new Schema({
-  ar: {
+  ar: { //TODO: 이미지서버 알아보기
     type: String
   },
   text: {
@@ -13,7 +13,7 @@ const memoSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  geometry: {
+  geometry: { //TODO: 좌표처리부분 알아보기
     coordinates: {
       type: [Number]
     }
@@ -21,11 +21,7 @@ const memoSchema = new Schema({
   reviews: [{
     type: Schema.Types.ObjectId,
     ref: 'MemoReview'
-  }],
-  date: {
-    type: Date,
-    default: Date.now
-  }
+  }]
 })
 
 module.exports = mongoose.model('Memo', memoSchema)

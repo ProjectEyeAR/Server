@@ -4,7 +4,7 @@ module.exports = ({init, db}) => {
   const passport = require('passport')
   const LocalStrategy = require('passport-local').Strategy;
   const api = require('express').Router()
-  //@pwd
+  //@security
   const bkfd2Password = require("pbkdf2-password");
   const hasher = bkfd2Password();
   const {checkLoggedIn, checkLoggedOut} = require('../middleware/authenticate')
@@ -12,8 +12,11 @@ module.exports = ({init, db}) => {
   api.post('/register', (req, res) => {
     let newUser
 
-    return hasher({password:req.body.password}, function(err, pass, salt, hash) {
-      if (err) return res.status(500).json({ message: err, success: falst })
+    return hasher({
+      password: req.body.password
+    }, function(err, pass, salt, hash) {
+      if (err)
+        return res.status(500).json({message: err, success: falst})
 
       newUser = new User({
         authId: 'local:' + req.body.email,
@@ -25,16 +28,20 @@ module.exports = ({init, db}) => {
 
       newUser.save((err, newUser) => {
         if (err)
-          return res.status(500).json({ message: err, success: false })
+          return res.status(500).json({message: err, success: false})
         else
-          return res.status(200).json({ message: newUser, success: true })
+          return res.status(200).json({message: newUser, success: true})
       })
     })
   })
 
-  //login 실패시
+  //login 실패시 작동되는 라우터
   api.get('/login', (req, res) => {
-    if (req.flash) return res.status(400).json({ message: req.flash('error')[0], success: false })
+    if (req.flash)
+      return res.status(400).json({
+        message: req.flash('error')[0],
+        success: false
+      })
   })
 
   api.post('/login', passport.authenticate('local', {
@@ -42,18 +49,23 @@ module.exports = ({init, db}) => {
     failureRedirect: '/api/auth/login',
     failureFlash: true
   }), (req, res) => {
-    res.status(200).json({ message: req.user, success: true })
+    res.status(200).json({message: req.user, success: true})
   })
 
-//TODO 로그아웃중복처리
+  //TODO 로그아웃중복처리
   api.get('/logout', (req, res) => {
     req.logout()
-    res.status(200).json({ message: "성공적으로 로그아웃함", success: true })
+    res.status(200).json({message: "성공적으로 로그아웃함", success: true})
   })
 
   api.get('/me', checkLoggedIn, (req, res) => {
-    res.status(401).json({ message: req.user, success: true })
+    res.status(401).json({message: req.user, success: true})
   })
+
+  //@facebook router
+  api.get('/facebook', passport.authenticate('facebook', {scope: 'email'}));
+
+  api.get('/facebook/callback', passport.authenticate('facebook', {failureRedirect: '/login', successRedirect: '/me'}));
 
   return api
 }

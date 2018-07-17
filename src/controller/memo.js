@@ -3,7 +3,7 @@ module.exports = ({init, db }) => {
   const api = require('express').Router()
 
   api.get('/', async (req, res) => {
-    let memos = await Memo.find().sort('date')
+    let memos = await Memo.find().sort('date') //TODO : 최신정보 보여주기 개수 정해서
     res.status(200).json({ message: memos, success: true })
   })
 
