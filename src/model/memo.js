@@ -1,9 +1,19 @@
 const mongoose = require('mongoose')
-const MemoReview = require('./memo_review')
 const Schema = mongoose.Schema
 
+const geoSchema = new Schema({
+  type: {
+      type: String,
+      default: 'Point'
+  },
+  coordinates: {
+      type: [Number],
+      index: '2dsphere'
+  }
+});
+
 const memoSchema = new Schema({
-  ar: { //TODO: 이미지서버 알아보기
+  imgUrl: {
     type: String
   },
   text: {
@@ -13,15 +23,14 @@ const memoSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  geometry: { //TODO: 좌표처리부분 알아보기
-    coordinates: {
-      type: [Number]
-    }
+  tag: {
+    type: [String]
   },
-  reviews: [{
+  user: {
     type: Schema.Types.ObjectId,
-    ref: 'MemoReview'
-  }]
-})
+    ref: 'Memo'
+  },
+  geometry: geoSchema
+});
 
 module.exports = mongoose.model('Memo', memoSchema)

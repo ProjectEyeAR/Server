@@ -1,6 +1,4 @@
 const mongoose = require('mongoose')
-const Memo = require('./memo')
-// const MemoReview = require('./memo_review')
 const Schema = mongoose.Schema
 
 //TODO: validate 처리
@@ -20,16 +18,21 @@ const userSchema = new Schema({
   salt: {
     type: String
   },
-  photo: { //Or It can change to value(The URL of the image)
+  profile: {
     type: String
   },
-  // memos: {
-  //   type: Schema.Types.ObjectId,
-  //   ref: 'Memo'
-  // },
   date: {
     type: Date,
     default: Date.now
+  },
+  follwer: {
+    type: String
+  },
+  follwing: {
+    type: String
+  },
+  phoneNumber: {
+    type: String
   }
 })
 

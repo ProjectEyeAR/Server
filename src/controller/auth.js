@@ -18,12 +18,14 @@ module.exports = ({init, db}) => {
       if (err)
         return res.status(500).json({message: err, success: falst})
 
+        //이메일, 비밀번호, 이름, 전화번호
       newUser = new User({
         authId: 'local:' + req.body.email,
         email: req.body.email,
         password: hash,
         salt: salt,
-        displayName: req.body.displayName
+        displayName: req.body.displayName,
+        phoneNumber: req.body.phoneNumber
       })
 
       newUser.save((err, newUser) => {
@@ -55,7 +57,7 @@ module.exports = ({init, db}) => {
   //TODO 로그아웃중복처리
   api.get('/logout', (req, res) => {
     req.logout()
-    res.status(200).json({message: "성공적으로 로그아웃함", success: true})
+    res.status(200).json({message: "Successfuly logged in", success: true})
   })
 
   api.get('/me', checkLoggedIn, (req, res) => {
