@@ -9,6 +9,8 @@ module.exports = ({init, db}) => {
   const hasher = bkfd2Password();
   const {checkLoggedIn, checkLoggedOut} = require('../middleware/authenticate')
 
+  //TODO: profile구현
+
   api.post('/register', (req, res) => {
     let newUser
 
@@ -18,7 +20,7 @@ module.exports = ({init, db}) => {
       if (err)
         return res.status(500).json({message: err, success: falst})
 
-        //이메일, 비밀번호, 이름, 전화번호
+        //이메일, 비밀번호, 보여줄 이름, 전화번호 필요
       newUser = new User({
         authId: 'local:' + req.body.email,
         email: req.body.email,
@@ -37,7 +39,7 @@ module.exports = ({init, db}) => {
     })
   })
 
-  //login 실패시 작동되는 라우터
+  //POST login 실패시 failureRedircet에 의해 작동되는 라우터
   api.get('/login', (req, res) => {
     if (req.flash)
       return res.status(400).json({
@@ -46,6 +48,11 @@ module.exports = ({init, db}) => {
       })
   })
 
+  /*
+  passport에 의해서 작동됨 
+    usernameField: "email",
+    passwordField: "password",
+  */
   api.post('/login', passport.authenticate('local', {
     session: true,
     failureRedirect: '/api/auth/login',
@@ -54,10 +61,9 @@ module.exports = ({init, db}) => {
     res.status(200).json({message: req.user, success: true})
   })
 
-  //TODO 로그아웃중복처리
   api.get('/logout', (req, res) => {
     req.logout()
-    res.status(200).json({message: "Successfuly logged in", success: true})
+    res.status(200).json({message: "Successfuly logged out", success: true})
   })
 
   api.get('/me', checkLoggedIn, (req, res) => {

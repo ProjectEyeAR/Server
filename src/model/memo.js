@@ -3,12 +3,11 @@ const Schema = mongoose.Schema
 
 const geoSchema = new Schema({
   type: {
-      type: String,
-      default: 'Point'
+    type: String,
+    default: "Point"
   },
   coordinates: {
-      type: [Number],
-      index: '2dsphere'
+    type: [Number],
   }
 });
 
@@ -30,7 +29,10 @@ const memoSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Memo'
   },
-  geometry: geoSchema
+  loc: geoSchema
 });
 
+memoSchema.index({
+  loc: '2dsphere'
+});
 module.exports = mongoose.model('Memo', memoSchema)
