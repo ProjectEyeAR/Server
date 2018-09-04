@@ -14,7 +14,7 @@ module.exports = ({
   //TODO 이미지랑 위치만 뿌려주는 부분 
 
   //TODO 태그로 메모 찾는 부분
-  
+
   isEmpthy = o => {
     if (!o) {
       return true;
@@ -43,6 +43,8 @@ module.exports = ({
       console.log(o);
       //로그인이 되어있으면 유저 정보를 가져옴
       //console.log(req.user);
+
+      res.status(200).json({message: o, success: true})
     })
   })
 
