@@ -20,7 +20,7 @@ module.exports = ({init, db}) => {
       if (err)
         return res.status(500).json({message: err, success: falst})
 
-        //이메일, 비밀번호, 보여줄 이름, 전화번호 필요
+      //이메일, 비밀번호, 보여줄 이름, 전화번호 필요
       newUser = new User({
         authId: 'local:' + req.body.email,
         email: req.body.email,
@@ -63,7 +63,7 @@ module.exports = ({init, db}) => {
 
   api.get('/logout', (req, res) => {
     req.logout()
-    res.status(200).json({message: "Successfuly logged out", success: true})
+    res.status(200).json({message: "Successfully logged out", success: true})
   })
 
   api.get('/me', checkLoggedIn, (req, res) => {
