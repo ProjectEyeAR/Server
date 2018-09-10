@@ -21,7 +21,7 @@
     	  "password": "1234"
        }
 
-4. Check whether you are loged in.
+4. Check whether you were login.
  >GET http://localhost:3001/api/auth/me
 
        {
