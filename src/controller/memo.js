@@ -15,6 +15,8 @@ module.exports = ({
 
   //TODO 태그로 메모 찾는 부분
 
+  //TODO follower, follwing
+  
   isEmpthy = o => {
     if (!o) {
       return true;
@@ -176,19 +178,14 @@ module.exports = ({
     }
   })
 
-  //memo id로 memo를 찾고 업데이트 함
-  //@url: PUT http://localhost:3001/api/memo/5b8e3895e1d5b36e086078a2
-  //@warning: 완성되지않음, 엘리먼트 한 개만 바꿀 수 있는 기능 구현 중
-  api.put('/:id', checkLoggedIn, async (req, res) => {
+  //memo의 사진을 바꿈
+  //@url: PUT http://localhost:3001/api/memo/5b8e3895e1d5b36e086078a2/img
+  api.put('/:id/img', checkLoggedIn, async (req, res) => {
     try {
       await Memo.where('_id')
       .equals(req.params.id)
       .updateOne({
         imgUrl: req.body.imgUrl,
-        text: req.body.text,
-        tag: req.body.tag,
-        user: req.body.user,
-        loc: req.body.loc
       })
 
       res.status(200).json({message: "", success: true})
@@ -198,5 +195,39 @@ module.exports = ({
     }
   })
 
+    //memo의 text을 바꿈
+  //@url: PUT http://localhost:3001/api/memo/5b8e3895e1d5b36e086078a2/text
+  api.put('/:id/text', checkLoggedIn, async (req, res) => {
+    try {
+      await Memo.where('_id')
+      .equals(req.params.id)
+      .updateOne({
+        text: req.body.text,
+      })
+
+      res.status(200).json({message: "", success: true})
+      
+    } catch (err) {
+      res.status(500).json({message: err.message, success: false})
+    }
+  })
+
+    //memo의 tag을 바꿈
+  //@url: PUT http://localhost:3001/api/memo/5b8e3895e1d5b36e086078a2/tag
+  api.put('/:id/tag', checkLoggedIn, async (req, res) => {
+    try {
+      await Memo.where('_id')
+      .equals(req.params.id)
+      .updateOne({
+        tag: req.body.tag,
+      })
+
+      res.status(200).json({message: "", success: true})
+      
+    } catch (err) {
+      res.status(500).json({message: err.message, success: false})
+    }
+  })
+  //TODO follower, follwing
   return api
 }

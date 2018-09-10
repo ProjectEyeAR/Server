@@ -1,8 +1,8 @@
 
 # Server 기능 명세서
-## Start-up
+## Start up
 1. *yarn dev* or *npm run dev*
-2. First sign up.
+2. At First, sign up.
 
 > POST http://localhost:3001/api/auth/register
 
@@ -67,7 +67,7 @@
        }
 
 ## Routers
-**Auth**
+**Auth**<br>
 SignUp
 
 >POST http://localhost:3001/api/auth/register
@@ -93,7 +93,7 @@ Me
 >GET http://localhost:3001/api/auth/me
 <hr>
 
-**Memo**
+**Memo**<br>
 Update
 >PUT http://localhost:3001/api/memo/5b8e3895e1d5b36e086078a2
 
