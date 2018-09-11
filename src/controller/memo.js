@@ -4,6 +4,8 @@ module.exports = ({init, db}) => {
   const api = require('express').Router()
   const {checkLoggedIn, checkLoggedOut} = require('../middleware/authenticate')
 
+  const hashtagRegex = /#.[^\s\d\t\n\r\.\*\\`~!@#$%^&()\-=+[{\]}|;:'",<>\/?]+/g
+
   //TODO 이미지 url 뿌리는 것으로, 아이디
 
   //TODO 이미지랑 위치만 뿌려주는 부분 
@@ -114,12 +116,19 @@ module.exports = ({init, db}) => {
   //로그인된 유저의 메모를 추가함
   //@url POST http://localhost:3001/api/memo
   api.post('/', checkLoggedIn, async (req, res) => {
+    let hashtags = req.body.text.match(hashtagRegex)
+    let hashtagsWithoutSharp = []
+
+    hashtags.foreach(hashtag => {
+      hashtagsWithoutSharp.append(hashtag.substring(1))
+    })
+
     try {
       let memo = await Memo.create({
         imgUrl: req.body.imgUrl,
         text: req.body.text,
         loc: req.body.loc,
-        tag: req.body.tag,
+        tag: hashtagsWithoutSharp,
         user: req.user._id
       })
 
