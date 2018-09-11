@@ -25,12 +25,6 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  follwer: {
-    type: String
-  },
-  follwing: {
-    type: String
-  },
   phoneNumber: {
     type: String
   }
