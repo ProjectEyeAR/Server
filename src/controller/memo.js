@@ -1,13 +1,7 @@
-module.exports = ({
-  init,
-  db
-}) => {
+module.exports = ({init, db}) => {
   const Memo = require('../model/memo')
   const api = require('express').Router()
-  const {
-    checkLoggedIn,
-    checkLoggedOut
-  } = require('../middleware/authenticate')
+  const {checkLoggedIn, checkLoggedOut} = require('../middleware/authenticate')
 
   //TODO 이미지 url 뿌리는 것으로, 아이디
 
