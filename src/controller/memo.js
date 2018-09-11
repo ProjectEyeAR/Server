@@ -16,7 +16,7 @@ module.exports = ({
   //TODO 태그로 메모 찾는 부분
 
   //TODO follower, follwing
-  
+
   isEmpthy = o => {
     if (!o) {
       return true;
@@ -71,7 +71,7 @@ module.exports = ({
   api.get('/near', checkLoggedIn, async (req, res) => {
     if (isEmpthy((req.query.lng) || isEmpthy(req.query.lat))) {
       return res.status(400).json({
-        message: "lng or lat query is empthy. Plase check your get request added lng, lat query.",
+        message: "lng or lat query is empty. Plase check your get request whether it be added lng and lat query.",
         success: false
       })
     }
@@ -156,7 +156,7 @@ module.exports = ({
       .where('user')
       .equals(req.user._id)
 
-      res.status(200).json({message: "Successfully deleted all documents belongs to a logged in user", success: true})
+      res.status(200).json({message: "Successfully deleted all documents belongs to the logged in user", success: true})
 
     } catch (err) {
       res.status(500).json({message: err.message, success: false})
@@ -171,7 +171,7 @@ module.exports = ({
       .equals(req.params.id)
       .deleteOne()
 
-      res.status(200).json({message: "Successfully deleted one document belongs to a logged in user", success: true})
+      res.status(200).json({message: "Successfully deleted one document belongs to the logged in user", success: true})
 
     } catch (err) {
       res.status(500).json({message: err.message, success: false})
@@ -195,7 +195,7 @@ module.exports = ({
     }
   })
 
-    //memo의 text을 바꿈
+  //memo의 text을 바꿈
   //@url: PUT http://localhost:3001/api/memo/5b8e3895e1d5b36e086078a2/text
   api.put('/:id/text', checkLoggedIn, async (req, res) => {
     try {
