@@ -65,6 +65,6 @@ module.exports = (app) => {
     //find user
     return done(null, user);
     //create user
-    return done(null, newuser);
+    //return done(null, newuser);
   }));
 }
