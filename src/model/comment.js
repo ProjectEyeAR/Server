@@ -8,7 +8,7 @@ const commentSchema = new Schema({
   },
   emoji: {
     type: String,
-    enum: ["HAPPY", "SAD", "LIKE", "DISLIKE"]
+    enum: ['HAPPY', 'SAD', 'LIKE', 'DISLIKE']
   },
   date: {
     type: Date,

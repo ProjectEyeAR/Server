@@ -1,15 +1,15 @@
 module.exports = ({init, db}) => {
 	const {checkLoggedIn, checkLoggedOut} = require('../middleware/authenticate')
+	const ErrorMessage = require('../error_message')
 	const Following = require('../model/following')
-	const Api = require('express').Router()
+	const api = require('express').Router()
 
-	Api.get('/following/count', async (req, res) => {
+	api.get('/following/count', async (req, res) => {
 		let userId = req.userId
 
 		if (!userId || typeof(userId) !== 'number') {
 			return res.status(404).json({
-				message: 'Can\'t find user.',
-				success: false
+				message: errorMessage.INVALID_QUERY_PARAMETER + ' (userId)'
 			})
 		}
 
@@ -19,25 +19,18 @@ module.exports = ({init, db}) => {
 			const fields = 'followUser'
 			let count = await Following.count(query)
 
-			res.status(200).json({
-				message: count,
-				success: true
-			})
+			res.status(200).json({ data: count })
 		} catch (err) {
-			res.status(500).json({
-				message: err.message,
-				success: false
-			})
+			res.status(500).json({ message: err.message })
 		}
 	})
 
-	Api.get('/follower/count', async (req, res) => {
+	api.get('/follower/count', async (req, res) => {
 		let userId = req.userId
 
 		if (!userId || typeof(userId) !== 'number') {
 			return res.status(404).json({
-				message: 'Can\'t find user.',
-				success: false
+				message: errorMessage.INVALID_QUERY_PARAMETER + ' (userId)'
 			})
 		}
 
@@ -47,25 +40,18 @@ module.exports = ({init, db}) => {
 			const fields = 'user'
 			let count = await Following.count(query)
 
-			res.status(200).json({
-				message: count,
-				success: true
-			})
+			res.status(200).json({ data: count })
 		} catch (err) {
-			res.status(500).json({
-				message: err.message,
-				success: false
-			})
+			res.status(500).json({ message: err.message })
 		}
 	})
 
-	Api.get('/following', async (req, res) => {
+	api.get('/following', async (req, res) => {
 		let userId = req.userId
 
 		if (!userId || typeof(userId) !== 'number') {
 			return res.status(404).json({
-				message: 'Can\'t find user.',
-				success: false
+				message: errorMessage.INVALID_QUERY_PARAMETER + ' (userId)'
 			})
 		}
 
@@ -90,25 +76,18 @@ module.exports = ({init, db}) => {
 				users.append(followings.followUser)
 			})
 
-			res.status(200).json({
-				message: users,
-				success: true
-			})
+			res.status(200).json({ data: users })
 		} catch (err) {
-			res.status(500).json({
-		        message: err.message,
-		        success: false
-      		})
+			res.status(500).json({ message: err.message })
 		}
 	})
 
-	Api.get('/follower', async (req, res) => {
+	api.get('/follower', async (req, res) => {
 		let userId = req.userId
 
 		if (!userId || typeof(userId) !== 'number') {
 			return res.status(404).json({
-				message: 'Can\'t find user.',
-				success: false
+				message: errorMessage.INVALID_QUERY_PARAMETER + ' (userId)'
 			})
 		}
 
@@ -133,26 +112,19 @@ module.exports = ({init, db}) => {
 				followUsers.append(followings.user)
 			})
 
-			res.status(200).json({
-				message: followUsers,
-				success: true
-			})
+			res.status(200).json({ data: followUsers })
 		} catch (err) {
-			res.status(500).json({
-		        message: err.message,
-		        success: false
-      		})
+			res.status(500).json({ message: err.message })
 		}
 	})
 
-	Api.post('/', checkLoggedIn, async (req, res) => {
+	api.post('/', checkLoggedIn, async (req, res) => {
 		let userId = req.user._id
 		let followUserId = req.followUserId
 
 		if (!followUserId || typeof(followUserId) !== 'number') {
 			return res.status(404).json({
-				message: 'Can\'t find follow user.',
-				success: false
+				message: errorMessage.INVALID_QUERY_PARAMETER + ' (followUserId)'
 			})
 		}
 
@@ -162,26 +134,19 @@ module.exports = ({init, db}) => {
 				followUser: followUserId
 			})
 
-			res.status(200).json({
-		        message: following,
-		        success: true
-		    })
+			res.status(200).json({ data: following })
 		} catch (err) {
-			res.status(500).json({
-		        message: err.message,
-		        success: false
-      		})
+			res.status(500).json({ message: err.message })
 		}
 	})
 
-	Api.delete('/', (req, res) => {
+	api.delete('/', checkLoggedIn, async (req, res) => {
 		int userId = req.user._id
 		int followUserId = req.followUserId
 
 		if (!followUserId || typeof(followUserId) !== 'number') {
 			return res.status(404).json({
-				message: 'Can\'t find follow user.',
-				success: false
+				message: errorMessage.INVALID_QUERY_PARAMETER + ' (followUserId)'
 			})
 		}
 
@@ -189,12 +154,9 @@ module.exports = ({init, db}) => {
 			const query = {user: userId, followUser: followUserId}
 			await Following.findOneAndDelete(query)
 
-			res.status(200).json({success: true})
+			res.status(200).json({})
 		} catch (err) {
-			res.status(500).json({
-		        message: err.message,
-		        success: false
-      		})
+			res.status(500).json({ message: err.message })
 		}
 	})
 }

@@ -1,4 +1,5 @@
 module.exports = ({init, db}) => {
+  const errorMessage = require('../error_message')
   const Memo = require('../model/memo')
   const api = require('express').Router()
   const {checkLoggedIn, checkLoggedOut} = require('../middleware/authenticate')
@@ -25,14 +26,14 @@ module.exports = ({init, db}) => {
   //@url: GET http://localhost:3001/api/memo/test
   api.get('/test', checkLoggedIn, async (req, res) => {
     Memo.create({
-      "imgUrl": "Server\\Pictures\\i14182109167",
-      "text": "Myself in seoul",
-      "loc": {
-        "type": "Point",
-        "coordinates": [-80, 20]
+      'imgUrl': 'Server\\Pictures\\i14182109167',
+      'text': 'Myself in seoul',
+      'loc': {
+        'type': 'Point',
+        'coordinates': [-80, 20]
       },
-      "tag": ["seoul", "tour"],
-      "user": req.user._id
+      'tag': ['seoul', 'tour'],
+      'user': req.user._id
     }, (err, o) => {
       if (err) return console.log(err);
       //위에서 생성한 메모를 가져옴
@@ -40,7 +41,7 @@ module.exports = ({init, db}) => {
       //로그인이 되어있으면 유저 정보를 가져옴
       //console.log(req.user);
 
-      res.status(200).json({message: o, success: true})
+      res.status(200).json({message: o})
     })
   })
 
@@ -53,22 +54,28 @@ module.exports = ({init, db}) => {
       .equals(req.user._id)
       .count()
 
-      res.status(200).json({message: count, success: true})
+      res.status(200).json({ data: count })
 
     } catch(err) {
-      res.status(500).json({message: err.message, success: true})
+      res.status(500).json({ message: err.message })
     }
 
   })
   //로그인 상태에서, 주어진 좌표에서 가까운 메모 최대 30개 반환
   //@url: GET http://localhost:3001/api/memo/near?lng=-80&lat=20
   api.get('/near', checkLoggedIn, async (req, res) => {
-    if (isEmpthy((req.query.lng) || isEmpthy(req.query.lat))) {
+    if (isEmpthy(req.query.lng)) {
       return res.status(400).json({
-        message: "lng or lat query is empthy. Plase check your get request added lng, lat query.",
-        success: false
+        message: errorMessage.INVALID_QUERY_PARAMETER + ' (lng)'
       })
     }
+
+    if (isEmpthy(req.query.lat)) {
+      return res.status(400).json({
+        message: errorMessage.INVALID_QUERY_PARAMETER + ' (lat)'
+      })
+    }
+
     try {
       let memos = await Memo.find({})
         .where('loc')
@@ -81,16 +88,10 @@ module.exports = ({init, db}) => {
         })
         .limit(30)
 
-      res.status(200).json({
-        message: memos,
-        success: true
-      })
+      res.status(200).json({ data: memos })
 
     } catch (err) {
-      res.status(500).json({
-        message: err.message,
-        success: false
-      })
+      res.status(500).json({ message: err.message })
     }
   })
 
@@ -103,16 +104,10 @@ module.exports = ({init, db}) => {
         .equals(req.user._id)
         .sort('date')
 
-      res.status(200).json({
-        message: memos,
-        success: true
-      })
+      res.status(200).json({ data: memos })
 
     } catch (err) {
-      res.status(500).json({
-        message: err.message,
-        success: false
-      })
+      res.status(500).json({ message: err.message })
     }
   })
 
@@ -128,17 +123,11 @@ module.exports = ({init, db}) => {
         user: req.user._id
       })
 
-      res.status(200).json({
-        message: memo,
-        success: true
-      })
+      res.status(200).json({ data: memo })
 
     } catch (err) {
       console.error(err)
-      res.status(500).json({
-        message: err.message,
-        success: false
-      })
+      res.status(500).json({ message: err.message })
     }
   })
 
@@ -150,10 +139,10 @@ module.exports = ({init, db}) => {
       .where('user')
       .equals(req.user._id)
 
-      res.status(200).json({message: "Successfully deleted all documents belongs to a logged in user", success: true})
+      res.status(200).json({})
 
     } catch (err) {
-      res.status(500).json({message: err.message, success: false})
+      res.status(500).json({ message: err.message })
     }
   })
 
@@ -165,10 +154,10 @@ module.exports = ({init, db}) => {
       .equals(req.params.id)
       .deleteOne()
 
-      res.status(200).json({message: "Successfully deleted one document belongs to a logged in user", success: true})
+      res.status(200).json({})
 
     } catch (err) {
-      res.status(500).json({message: err.message, success: false})
+      res.status(500).json({ message: err.message })
     }
   })
 
@@ -182,10 +171,10 @@ module.exports = ({init, db}) => {
         imgUrl: req.body.imgUrl,
       })
 
-      res.status(200).json({message: "", success: true})
+      res.status(200).json({})
       
     } catch (err) {
-      res.status(500).json({message: err.message, success: false})
+      res.status(500).json({ message: err.message })
     }
   })
 
@@ -199,10 +188,10 @@ module.exports = ({init, db}) => {
         text: req.body.text,
       })
 
-      res.status(200).json({message: "", success: true})
+      res.status(200).json({})
       
     } catch (err) {
-      res.status(500).json({message: err.message, success: false})
+      res.status(500).json({ message: err.message })
     }
   })
 
@@ -216,10 +205,10 @@ module.exports = ({init, db}) => {
         tag: req.body.tag,
       })
 
-      res.status(200).json({message: "", success: true})
+      res.status(200).json({})
       
     } catch (err) {
-      res.status(500).json({message: err.message, success: false})
+      res.status(500).json({ message: err.message })
     }
   })
   //TODO follower, follwing

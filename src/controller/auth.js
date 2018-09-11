@@ -5,7 +5,7 @@ module.exports = ({init, db}) => {
   const LocalStrategy = require('passport-local').Strategy;
   const api = require('express').Router()
   //@security
-  const bkfd2Password = require("pbkdf2-password");
+  const bkfd2Password = require('pbkdf2-password');
   const hasher = bkfd2Password();
   const {checkLoggedIn, checkLoggedOut} = require('../middleware/authenticate')
 
@@ -18,7 +18,7 @@ module.exports = ({init, db}) => {
       password: req.body.password
     }, function(err, pass, salt, hash) {
       if (err)
-        return res.status(500).json({message: err, success: falst})
+        return res.status(500).json({message: err})
 
       //이메일, 비밀번호, 보여줄 이름, 전화번호 필요
       newUser = new User({
@@ -32,9 +32,9 @@ module.exports = ({init, db}) => {
 
       newUser.save((err, newUser) => {
         if (err)
-          return res.status(500).json({message: err, success: false})
+          return res.status(500).json({message: err})
         else
-          return res.status(200).json({message: newUser, success: true})
+          return res.status(201).json({data: newUser})
       })
     })
   })
@@ -43,8 +43,7 @@ module.exports = ({init, db}) => {
   api.get('/login', (req, res) => {
     if (req.flash)
       return res.status(400).json({
-        message: req.flash('error')[0],
-        success: false
+        message: req.flash('error')[0]
       })
   })
 
@@ -58,16 +57,16 @@ module.exports = ({init, db}) => {
     failureRedirect: '/api/auth/login',
     failureFlash: true
   }), (req, res) => {
-    res.status(200).json({message: req.user, success: true})
+    res.status(200).json({data: req.user})
   })
 
   api.get('/logout', (req, res) => {
     req.logout()
-    res.status(200).json({message: "Successfully logged out", success: true})
+    res.status(200).json({})
   })
 
   api.get('/me', checkLoggedIn, (req, res) => {
-    res.status(401).json({message: req.user, success: true})
+    res.status(401).json({data: req.user})
   })
 
   //@facebook router
