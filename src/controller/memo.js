@@ -4,7 +4,45 @@ module.exports = ({init, db}) => {
   const api = require('express').Router()
   const {checkLoggedIn, checkLoggedOut} = require('../middleware/authenticate')
 
+  //image packages
+  const multer = require('multer');
+  const GridFsStorage = require('multer-gridfs-storage');
+  const Grid = require('gridfs-stream');
+  const crypto = require('crypto');
+  const path = require('path');
+  const mongoose = require('mongoose');
+
   const hashtagRegex = /#.[^\s\d\t\n\r\.\*\\`~!@#$%^&()\-=+[{\]}|;:'",<>\/?]+/g
+  
+  let test = mongoose.connection;
+  let gfs;
+  test.on('open', () => {
+    // Init stream
+    gfs = Grid(test.db, mongoose.mongo);
+    gfs.collection('uploads');
+  })
+
+  // Create storage engine
+  const storage = new GridFsStorage({
+    url: init.mongoUrl,
+    file: (req, file) => {
+      return new Promise((resolve, reject) => {
+        crypto.randomBytes(16, (err, buf) => {
+          if (err) {
+            return reject(err);
+          }
+          //랜덤생성된 이름 + 확장자
+          const filename = buf.toString('hex') + path.extname(file.originalname);
+          const fileInfo = {
+            filename: filename,
+            bucketName: 'uploads'
+          };
+          resolve(fileInfo);
+        });
+      });
+    }
+  });
+  const upload = multer({ storage });
 
   //TODO 이미지 url 뿌리는 것으로, 아이디
 
@@ -23,6 +61,43 @@ module.exports = ({init, db}) => {
     }
     return false;
   }
+  
+  /* 
+  *testing image uploading
+  *
+  */
+  
+  // @route POST /upload
+  // @desc  Uploads a file to DB
+  api.post('/upload', upload.single('file'), (req, res) => {
+    res.json({ file: req.file });
+  //res.redirect('/');
+  });
+
+  // @route GET /image/:filename
+  // @desc Display Image
+  api.get('/image/:filename', (req, res) => {
+    gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
+      // Check if file
+      if (!file || file.length === 0) {
+        return res.status(404).json({
+          err: 'No file exists'
+        });
+      }
+
+      // Check if image
+      if (file.contentType === 'image/jpeg' || file.contentType === 'image/png') {
+        // Read output to browser
+        const readstream = gfs.createReadStream(file.filename);
+        readstream.pipe(res);
+      } else {
+        res.status(404).json({
+          err: 'Not an image'
+        });
+      }
+    });
+  });
+
 
   //테스트 용, 더미 다큐먼트를 생성 후 콘솔창에 출력함
   //@url: GET http://localhost:3001/api/memo/test
@@ -222,6 +297,8 @@ module.exports = ({init, db}) => {
       res.status(500).json({ message: err.message })
     }
   })
+
+
 
   return api
 }
