@@ -12,8 +12,10 @@ const geoSchema = new Schema({
 });
 
 const memoSchema = new Schema({
-  img: {
-    type: String
+  imgId: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: "Uploads.Files"
   },
   text: {
     type: String
@@ -23,7 +25,12 @@ const memoSchema = new Schema({
     default: Date.now
   },
   tags: {
-    type: String
+    type: [String],
+    set: item => {
+      if(Array.isArray(item)) {
+        return item.join('')
+      }
+    }
   },
   user: {
     type: Schema.Types.ObjectId,
@@ -35,4 +42,5 @@ const memoSchema = new Schema({
 memoSchema.index({
   loc: '2dsphere'
 });
+
 module.exports = mongoose.model('Memo', memoSchema)

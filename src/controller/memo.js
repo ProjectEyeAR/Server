@@ -5,7 +5,8 @@ module.exports = ({init, db}) => {
   const {checkLoggedIn, checkLoggedOut} = require('../middleware/authenticate')
   const {upload, gfs} = require('../config/gridfs')(init, db);
 
-  const hashtagRegex = /#.[^\s\d\t\n\r\.\*\\`~!@#$%^&()\-=+[{\]}|;:'",<>\/?]+/g
+  //HACK!! 왜 숫자 제외하는지 물어보기
+  const hashtagRegex = /#.[^\s\d\t\n\r\.\*\\`~!@#$%^&()\-=+[{\]}|;:'",<>\/?]+/g //ex: #tag1#tag2 => #tag#tag
 
   //TODO 이미지 url 뿌리는 것으로, 아이디
 
@@ -14,6 +15,8 @@ module.exports = ({init, db}) => {
   //TODO 태그로 메모 찾는 부분
 
   //TODO follower, follwing
+
+  //HACK!! get라우터 한번에 이미지 + memo 데이터 불러오고 싶은데 할 수 없음... memo에 이미지 id 넣고 이미지는 따로 라우터 통해서 불러오는 식으로... 
 
   isEmpthy = o => {
     if (!o) {
@@ -36,7 +39,7 @@ module.exports = ({init, db}) => {
 
   // @route GET /image/:filename
   // @desc Display Image
-  api.get('/image/:filename', (req, res) => {
+  api.get('/image', (req, res) => {
     gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
       // Check if file
       if (!file || file.length === 0) {
@@ -64,13 +67,13 @@ module.exports = ({init, db}) => {
   api.get('/test', checkLoggedIn, async (req, res) => {
     Memo.create({
       //TODO: 실제 서버에 저장되어있는 이미지 주소 쓰기
-      'img': 'Server\\Pictures\\i14182109167',
+      'imgId': 'Server\\Pictures\\i14182109167',
       'text': 'Myself in seoul',
       'loc': {
         'type': 'Point',
         'coordinates': [-80, 20]
       },
-      'tag': ['seoul', 'tour'],
+      'tags': ['seoul', 'tour'],
       'user': req.user._id
     }, (err, o) => {
       if (err) return console.log(err);
@@ -97,7 +100,6 @@ module.exports = ({init, db}) => {
     } catch(err) {
       res.status(500).json({ message: err.message })
     }
-
   })
 
   //로그인 상태에서, 주어진 좌표에서 가까운 메모 최대 30개 반환
@@ -138,10 +140,22 @@ module.exports = ({init, db}) => {
   //@url : GET http://localhost:3001/api/memo
   api.get('/', checkLoggedIn, async (req, res) => {
     try {
-      let memos = await Memo.find({})
+      let images;
+      let memos;
+      
+      await Memo.find({})
         .where('user')
         .equals(req.user._id)
         .sort('date')
+        .populate('imgId')
+        .exec(function (err, memos) {
+          // memos.forEach(function(memo) {
+          //   gfs.files.findOne({_id: memo.imgId}, function (err, file) {
+          //     console.log(file);
+          //   })
+          // })
+          console.log(memos);
+        })
 
       res.status(200).json({ data: memos })
 
@@ -149,30 +163,32 @@ module.exports = ({init, db}) => {
       res.status(500).json({ message: err.message })
     }
   })
+  
 
   //로그인된 유저의 메모를 추가함
   //@url POST http://localhost:3001/api/memo
-  api.post('/', [checkLoggedIn, upload.single('file')], async (req, res) => {
-    // let hashtags = req.body.text.match(hashtagRegex)
-    // let hashtagsWithoutSharp = []
+  //img가 들어오면 imgId를 메모에 저장, img는 다른 컬렉션에 저장
+  api.post('/', [checkLoggedIn, upload.single('img')], async (req, res) => {
+    let hashtagsWithoutSharp = []
+    if (req.body.tags) { 
+      let hashtags = req.body.tags.match(hashtagRegex)
 
-    // hashtags.foreach(hashtag => {
-    //   hashtagsWithoutSharp.append(hashtag.substring(1))
-    // })
-    
+      hashtags.forEach(hashtag => {
+        hashtagsWithoutSharp.push(hashtag.substring(1))
+      })
+    }
     try {
       let memo = await Memo.create({
-        img: req.body.img,
+        imgId: req.file.id,
         text: req.body.text,
         loc: req.body.loc,
-        tag: hashtagsWithoutSharp,
+        tags: hashtagsWithoutSharp,
         user: req.user._id
       })
 
       res.status(200).json({ data: memo })
 
     } catch (err) {
-      console.error(err)
       res.status(500).json({ message: err.message })
     }
   })
@@ -208,13 +224,13 @@ module.exports = ({init, db}) => {
   })
 
   //memo의 사진을 바꿈
-  //@url: PUT http://localhost:3001/api/memo/5b8e3895e1d5b36e086078a2/img
-  api.put('/:id/img', checkLoggedIn, async (req, res) => {
+  //@url: PUT http://localhost:3001/api/memo/5b8e3895e1d5b36e086078a2/imgId
+  api.put('/:id/imgId', checkLoggedIn, async (req, res) => {
     try {
       await Memo.where('_id')
       .equals(req.params.id)
       .updateOne({
-        img: req.body.img,
+        imgId: req.body.imgId,
       })
 
       res.status(200).json({})
@@ -242,13 +258,13 @@ module.exports = ({init, db}) => {
   })
 
     //로그엔된 유저 memo의 tag을 바꿈
-  //@url: PUT http://localhost:3001/api/memo/5b8e3895e1d5b36e086078a2/tag
-  api.put('/:id/tag', checkLoggedIn, async (req, res) => {
+  //@url: PUT http://localhost:3001/api/memo/5b8e3895e1d5b36e086078a2/tags
+  api.put('/:id/tags', checkLoggedIn, async (req, res) => {
     try {
       await Memo.where('_id')
       .equals(req.params.id)
       .updateOne({
-        tag: req.body.tag,
+        tags: req.body.tags,
       })
 
       res.status(200).json({})
