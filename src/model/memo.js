@@ -22,12 +22,12 @@ const memoSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  tag: {
-    type: [String]
+  tags: {
+    type: String
   },
   user: {
     type: Schema.Types.ObjectId,
-    ref: 'Memo'
+    ref: 'User'
   },
   loc: geoSchema
 });
