@@ -12,7 +12,7 @@ const geoSchema = new Schema({
 });
 
 const memoSchema = new Schema({
-  imgUrl: {
+  img: {
     type: String
   },
   text: {

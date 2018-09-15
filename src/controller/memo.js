@@ -64,7 +64,7 @@ module.exports = ({init, db}) => {
   api.get('/test', checkLoggedIn, async (req, res) => {
     Memo.create({
       //TODO: 실제 서버에 저장되어있는 이미지 주소 쓰기
-      'imgUrl': 'Server\\Pictures\\i14182109167',
+      'img': 'Server\\Pictures\\i14182109167',
       'text': 'Myself in seoul',
       'loc': {
         'type': 'Point',
@@ -152,17 +152,17 @@ module.exports = ({init, db}) => {
 
   //로그인된 유저의 메모를 추가함
   //@url POST http://localhost:3001/api/memo
-  api.post('/', checkLoggedIn, async (req, res) => {
+  api.post('/', [checkLoggedIn, upload.single('file')], async (req, res) => {
     // let hashtags = req.body.text.match(hashtagRegex)
     // let hashtagsWithoutSharp = []
 
     // hashtags.foreach(hashtag => {
     //   hashtagsWithoutSharp.append(hashtag.substring(1))
     // })
-
+    
     try {
       let memo = await Memo.create({
-        imgUrl: req.body.imgUrl,
+        img: req.body.img,
         text: req.body.text,
         loc: req.body.loc,
         tag: hashtagsWithoutSharp,
@@ -214,7 +214,7 @@ module.exports = ({init, db}) => {
       await Memo.where('_id')
       .equals(req.params.id)
       .updateOne({
-        imgUrl: req.body.imgUrl,
+        img: req.body.img,
       })
 
       res.status(200).json({})
