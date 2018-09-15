@@ -19,7 +19,7 @@ module.exports = ({init, db}) => {
     }, function(err, pass, salt, hash) {
       if (err)
         return res.status(500).json({message: err})
-
+      //TODO: 복호화 안됨, 다른 라이브러리 쓸 것!
       //이메일, 비밀번호, 보여줄 이름, 전화번호 필요
       newUser = new User({
         authId: 'local:' + req.body.email,

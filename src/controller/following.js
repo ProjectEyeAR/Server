@@ -8,6 +8,7 @@ module.exports = ({init, db}) => {
 		let userId = req.userId
 
 		if (!userId || typeof(userId) !== 'number') {
+			//TODO: 400 or 404?
 			return res.status(404).json({
 				message: errorMessage.INVALID_QUERY_PARAMETER + ' (userId)'
 			})
@@ -124,6 +125,7 @@ module.exports = ({init, db}) => {
 	//팔로우 추가
 	api.post('/', checkLoggedIn, async (req, res) => {
 		let userId = req.user._id
+		//HACK!!
 		let followUserId = req.followUserId
 
 		if (!followUserId || typeof(followUserId) !== 'number') {

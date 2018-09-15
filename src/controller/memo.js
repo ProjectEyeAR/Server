@@ -3,46 +3,9 @@ module.exports = ({init, db}) => {
   const Memo = require('../model/memo')
   const api = require('express').Router()
   const {checkLoggedIn, checkLoggedOut} = require('../middleware/authenticate')
-
-  //image packages
-  const multer = require('multer');
-  const GridFsStorage = require('multer-gridfs-storage');
-  const Grid = require('gridfs-stream');
-  const crypto = require('crypto');
-  const path = require('path');
-  const mongoose = require('mongoose');
+  const {upload, gfs} = require('../config/gridfs')(init, db);
 
   const hashtagRegex = /#.[^\s\d\t\n\r\.\*\\`~!@#$%^&()\-=+[{\]}|;:'",<>\/?]+/g
-  
-  let test = mongoose.connection;
-  let gfs;
-  test.on('open', () => {
-    // Init stream
-    gfs = Grid(test.db, mongoose.mongo);
-    gfs.collection('uploads');
-  })
-
-  // Create storage engine
-  const storage = new GridFsStorage({
-    url: init.mongoUrl,
-    file: (req, file) => {
-      return new Promise((resolve, reject) => {
-        crypto.randomBytes(16, (err, buf) => {
-          if (err) {
-            return reject(err);
-          }
-          //랜덤생성된 이름 + 확장자
-          const filename = buf.toString('hex') + path.extname(file.originalname);
-          const fileInfo = {
-            filename: filename,
-            bucketName: 'uploads'
-          };
-          resolve(fileInfo);
-        });
-      });
-    }
-  });
-  const upload = multer({ storage });
 
   //TODO 이미지 url 뿌리는 것으로, 아이디
 
@@ -61,18 +24,15 @@ module.exports = ({init, db}) => {
     }
     return false;
   }
-  
-  /* 
-  *testing image uploading
-  *
-  */
-  
+
   // @route POST /upload
   // @desc  Uploads a file to DB
   api.post('/upload', upload.single('file'), (req, res) => {
     res.json({ file: req.file });
   //res.redirect('/');
   });
+
+  //HACK!! find를 2번 해야하나??
 
   // @route GET /image/:filename
   // @desc Display Image
@@ -193,12 +153,12 @@ module.exports = ({init, db}) => {
   //로그인된 유저의 메모를 추가함
   //@url POST http://localhost:3001/api/memo
   api.post('/', checkLoggedIn, async (req, res) => {
-    let hashtags = req.body.text.match(hashtagRegex)
-    let hashtagsWithoutSharp = []
+    // let hashtags = req.body.text.match(hashtagRegex)
+    // let hashtagsWithoutSharp = []
 
-    hashtags.foreach(hashtag => {
-      hashtagsWithoutSharp.append(hashtag.substring(1))
-    })
+    // hashtags.foreach(hashtag => {
+    //   hashtagsWithoutSharp.append(hashtag.substring(1))
+    // })
 
     try {
       let memo = await Memo.create({
