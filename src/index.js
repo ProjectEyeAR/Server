@@ -6,16 +6,19 @@ const router = express.Router()
 const routes = require('./routes')({router, init})
 const bodyParser = require('body-parser')
 //@development
-const dev = require('./config/development')
-//@security
-const helmet = require('helmet')
-require('express-async-errors')
+const dev = require('./config/development')(app)
+//@production
+const prod = require('./config/production')(app)
+//require('express-async-errors')
 //@session
 const session = require('./config/session')({app, init})
 //@passport
-const passport = require('./config/passport')(app)
-const flash = require('connect-flash');
-const cookieParser = require('cookie-parser');
+const passport = require('./config/passport')({app, init})
+const flash = require('connect-flash')
+const cookieParser = require('cookie-parser')
+//@security
+const helmet = require('helmet')
+app.use(helmet())
 
 app.use(cookieParser());
 app.use(flash());

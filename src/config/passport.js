@@ -1,4 +1,4 @@
-module.exports = (app) => {
+module.exports = ({app, init}) => {
   const passport = require('passport');
   const FacebookStrategy = require('passport-facebook').Strategy;
   const LocalStrategy = require('passport-local').Strategy;
@@ -44,8 +44,9 @@ module.exports = (app) => {
   }));
 
   passport.use(new FacebookStrategy({
-    clientID: '184175998929190',
-    clientSecret: '63c4db76ea6d23097b0bc2b6bed4f668',
+    //TODO: 키 감추기!
+    clientID: init.clientID,
+    clientSecret: init.clientSecret,
     callbackURL: "/api/auth/facebook/callback",
     profileFields: [
       'id',

@@ -4,21 +4,22 @@ const Schema = mongoose.Schema
 const geoSchema = new Schema({
   type: {
     type: String,
-    default: "Point"
+    default: 'Point'
   },
   coordinates: {
     type: [Number],
+    default: []
   }
 });
 
 const memoSchema = new Schema({
-  imgId: {
-    type: Schema.Types.ObjectId,
-    required: true,
-    ref: "Uploads.Files"
+  img: {
+    type: String,
+    default: ""
   },
   text: {
-    type: String
+    type: String,
+    default: ""
   },
   date: {
     type: Date,
@@ -26,15 +27,13 @@ const memoSchema = new Schema({
   },
   tags: {
     type: [String],
-    set: item => {
-      if(Array.isArray(item)) {
-        return item.join('')
-      }
-    }
+    defulat: []
   },
   user: {
     type: Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    required: true,
+
   },
   loc: geoSchema
 });

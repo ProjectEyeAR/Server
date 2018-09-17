@@ -1,3 +1,9 @@
 {
-  "name": "SeoulAppContest - Development"
+    "mongoUrl" : "mongoUrl",
+    "SESSION_SECRET_KEY": "SESSION_SECRET_KEY",
+    "AWS_ACCESS_KEY": "AWS_ACCESS_KEY",
+    "AWS_SECRET_ACCESS_KEY": "AWS_SECRET_ACCESS_KEY",
+    "HerokuUrl": "HerokuUrl",
+    "clientID": "clientID",
+    "clientSecret": "clientSecret"
 }

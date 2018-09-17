@@ -4,7 +4,7 @@ module.exports = ({app, init}) => {
   const mongoose = require('mongoose');
 
   app.use(require('express-session')({
-      secret: 'keyboard cat', //TODO: 키 감출것
+      secret: init.SESSION_SECRET_KEY,
       resave: false,
       rolling: false,
       saveUninitialized: true,
