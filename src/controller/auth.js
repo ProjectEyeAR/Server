@@ -9,35 +9,6 @@ module.exports = ({init, db}) => {
   const hasher = bkfd2Password();
   const {checkLoggedIn, checkLoggedOut} = require('../middleware/authenticate')
 
-  //TODO: profile구현
-
-  api.post('/user', (req, res) => {
-    let newUser
-
-    return hasher({
-      password: req.body.password
-    }, function(err, pass, salt, hash) {
-      if (err)
-        return res.status(500).json({message: err})
-      //이메일, 비밀번호, 보여줄 이름, 전화번호 필요
-      newUser = new User({
-        authId: 'local:' + req.body.email,
-        email: req.body.email,
-        password: hash,
-        salt: salt,
-        displayName: req.body.displayName,
-        phoneNumber: req.body.phoneNumber
-      })
-
-      newUser.save((err, newUser) => {
-        if (err)
-          return res.status(500).json({message: err})
-        else
-          return res.status(201).json({data: newUser})
-      })
-    })
-  })
-
   //POST login 실패시 failureRedircet에 의해 작동되는 라우터
   api.get('/session', (req, res) => {
     if (req.flash)
