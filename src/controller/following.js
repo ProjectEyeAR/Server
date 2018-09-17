@@ -5,7 +5,7 @@ module.exports = ({init, db}) => {
 	const api = require('express').Router()
 
 	api.get('/following/count', async (req, res) => {
-		let userId = req.userId
+		let userId = req.query.userId
 
 		if (!userId || typeof(userId) !== 'number') {
 			//TODO: 400 or 404?
@@ -27,7 +27,7 @@ module.exports = ({init, db}) => {
 	})
 
 	api.get('/follower/count', async (req, res) => {
-		let userId = req.userId
+		let userId = req.query.userId
 
 		if (!userId || typeof(userId) !== 'number') {
 			return res.status(404).json({
@@ -49,7 +49,9 @@ module.exports = ({init, db}) => {
 
 	//자신이 팔로우하고있는 유저 정보 가져옴
 	api.get('/following', async (req, res) => {
-		let userId = req.userId
+		let userId = req.query.userId
+		let skip = req.query.skip
+		let limit = req.query.limit
 
 		if (!userId || typeof(userId) !== 'number') {
 			return res.status(404).json({
@@ -57,18 +59,18 @@ module.exports = ({init, db}) => {
 			})
 		}
 
-		if (!req.skip || typeof(req.skip) !== 'number') {
-			req.skip = 0
+		if (!skip || typeof(skip) !== 'number') {
+			skip = 0
 		}
 
-		if (!req.limit || typeof(req.limit) !== 'number') {
-			req.limit = 30
+		if (!limit || typeof(limit) !== 'number') {
+			limit = 30
 		}
 
 		let users = []
 		const query = {user: userId}
 		const fields = 'followUser'
-		const options = { skip: req.skip, limit: req.limit, sort: 'date' }
+		const options = { skip: skip, limit: limit, sort: 'date' }
 
 		try {
 			let followings = await Following.find(query, fields, options)
@@ -86,7 +88,9 @@ module.exports = ({init, db}) => {
 
 	//자신을 팔로우 하고있는 유저 정보를 가져옴
 	api.get('/follower', async (req, res) => {
-		let userId = req.userId
+		let userId = req.query.userId
+		let skip = req.query.skip
+		let limit = req.query.limit
 
 		if (!userId || typeof(userId) !== 'number') {
 			return res.status(404).json({
@@ -95,18 +99,18 @@ module.exports = ({init, db}) => {
 		}
 
 		//HACK!!
-		if (!req.skip || typeof(req.skip) !== 'number') {
-			req.skip = 0
+		if (!skip || typeof(skip) !== 'number') {
+			skip = 0
 		}
 		//HACK!!
-		if (!req.limit || typeof(req.limit) !== 'number') {
-			req.limit = 30
+		if (!limit || typeof(limit) !== 'number') {
+			limit = 30
 		}
 
 		let followUsers = []
 		const query = {followUser: userId}
 		const fields = 'user'
-		const options = { skip: req.skip, limit: req.limit, sort: 'date' }
+		const options = { skip: skip, limit: limit, sort: 'date' }
 
 		try {
 			let users = await Following.find(query, fields, options)
@@ -126,7 +130,7 @@ module.exports = ({init, db}) => {
 	api.post('/', checkLoggedIn, async (req, res) => {
 		let userId = req.user._id
 		//HACK!!
-		let followUserId = req.followUserId
+		let followUserId = req.query.followUserId
 
 		if (!followUserId || typeof(followUserId) !== 'number') {
 			return res.status(404).json({
@@ -148,7 +152,7 @@ module.exports = ({init, db}) => {
 
 	api.delete('/', checkLoggedIn, async (req, res) => {
 		let userId = req.user._id
-		let followUserId = req.followUserId
+		let followUserId = req.query.followUserId
 
 		if (!followUserId || typeof(followUserId) !== 'number') {
 			return res.status(404).json({
