@@ -1,6 +1,6 @@
 module.exports = ({init, db}) => {
 	const {checkLoggedIn, checkLoggedOut} = require('../middleware/authenticate')
-	const ErrorMessage = require('../error_message')
+	const errorMessage = require('../error_message')
 	const Following = require('../model/following')
 	const api = require('express').Router()
 
