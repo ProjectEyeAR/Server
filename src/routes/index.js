@@ -6,10 +6,10 @@ module.exports = ({router, init}) => {
 
   initializeDB(db => {
     //@url http://localhost:3001/api/memo
-    router.use('/memo', memo({init, db}))
+    router.use('/memos', memo({init, db}))
     //@url http://localhost:3001/api/auth
     router.use('/auth', auth({init, db}))
-    router.use('/following', following({init, db}))
+    router.use('/followings', following({init, db}))
   })
 
   return router

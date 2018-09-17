@@ -11,7 +11,7 @@ module.exports = ({init, db}) => {
 
   //TODO: profile구현
 
-  api.post('/register', (req, res) => {
+  api.post('/user', (req, res) => {
     let newUser
 
     return hasher({
@@ -39,7 +39,7 @@ module.exports = ({init, db}) => {
   })
 
   //POST login 실패시 failureRedircet에 의해 작동되는 라우터
-  api.get('/login', (req, res) => {
+  api.get('/session', (req, res) => {
     if (req.flash)
       return res.status(400).json({
         message: req.flash('error')[0]
@@ -51,15 +51,15 @@ module.exports = ({init, db}) => {
     usernameField: "email",
     passwordField: "password",
   */
-  api.post('/login', passport.authenticate('local', {
+  api.post('/session', passport.authenticate('local', {
     session: true,
-    failureRedirect: '/api/auth/login',
+    failureRedirect: '/api/auth/session',
     failureFlash: true
   }), (req, res) => {
     res.status(200).json({data: req.user})
   })
 
-  api.get('/logout', (req, res) => {
+  api.get('/session', (req, res) => {
     req.logout()
     res.status(200).json({})
   })

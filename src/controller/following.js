@@ -4,7 +4,7 @@ module.exports = ({init, db}) => {
 	const Following = require('../model/following')
 	const api = require('express').Router()
 
-	api.get('/following/count', async (req, res) => {
+	api.get('/count', async (req, res) => {
 		let userId = req.query.userId
 
 		if (!userId || typeof(userId) !== 'number') {
@@ -26,7 +26,7 @@ module.exports = ({init, db}) => {
 		}
 	})
 
-	api.get('/follower/count', async (req, res) => {
+	api.get('/followers/count', async (req, res) => {
 		let userId = req.query.userId
 
 		if (!userId || typeof(userId) !== 'number') {
@@ -48,7 +48,7 @@ module.exports = ({init, db}) => {
 	})
 
 	//자신이 팔로우하고있는 유저 정보 가져옴
-	api.get('/following', async (req, res) => {
+	api.get('/', async (req, res) => {
 		let userId = req.query.userId
 		let skip = req.query.skip
 		let limit = req.query.limit
@@ -87,7 +87,7 @@ module.exports = ({init, db}) => {
 	})
 
 	//자신을 팔로우 하고있는 유저 정보를 가져옴
-	api.get('/follower', async (req, res) => {
+	api.get('/followers', async (req, res) => {
 		let userId = req.query.userId
 		let skip = req.query.skip
 		let limit = req.query.limit
@@ -169,4 +169,6 @@ module.exports = ({init, db}) => {
 			res.status(500).json({ message: err.message })
 		}
 	})
+
+	return api
 }

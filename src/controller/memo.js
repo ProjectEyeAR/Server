@@ -115,8 +115,8 @@ module.exports = ({init, db}) => {
   //@url POST http://localhost:3001/api/memo
   api.post('/', [checkLoggedIn, upload.single('img')], async (req, res) => {
     let hashtagsWithoutSharp = []
-    if (req.body.tags) { 
-      let hashtags = req.body.tags.match(hashtagRegex)
+    if (req.body.text) { 
+      let hashtags = req.body.text.match(hashtagRegex)
       hashtags.forEach(hashtag => {
         hashtagsWithoutSharp.push(hashtag.substring(1))
       })
@@ -178,7 +178,7 @@ module.exports = ({init, db}) => {
 
   //memo의 사진을 바꿈
   //@url: PUT http://localhost:3001/api/memo/5b8e3895e1d5b36e086078a2/img
-  api.put('/:id/img', checkLoggedIn, async (req, res) => {
+  api.put('/:id/image', checkLoggedIn, async (req, res) => {
     try {
       await Memo.where('_id')
       .equals(req.params.id)
@@ -197,29 +197,20 @@ module.exports = ({init, db}) => {
   //memo의 text을 바꿈
   //@url: PUT http://localhost:3001/api/memo/5b8e3895e1d5b36e086078a2/text
   api.put('/:id/text', checkLoggedIn, async (req, res) => {
+    let hashtagsWithoutSharp = []
+    if (req.body.tags) { 
+      let hashtags = req.body.text.match(hashtagRegex)
+      hashtags.forEach(hashtag => {
+        hashtagsWithoutSharp.push(hashtag.substring(1))
+      })
+    }
+
     try {
       await Memo.where('_id')
       .equals(req.params.id)
       .updateOne({
         text: req.body.text,
-      })
-
-      res.status(200).json({})
-      
-    } catch (err) {
-      logger.error(err.message, err)
-      res.status(500).json({ message: err.message })
-    }
-  })
-
-    //로그엔된 유저 memo의 tag을 바꿈
-  //@url: PUT http://localhost:3001/api/memo/5b8e3895e1d5b36e086078a2/tags
-  api.put('/:id/tags', checkLoggedIn, async (req, res) => {
-    try {
-      await Memo.where('_id')
-      .equals(req.params.id)
-      .updateOne({
-        tags: req.body.tags,
+        tags: hashtagsWithoutSharp
       })
 
       res.status(200).json({})
