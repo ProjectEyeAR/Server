@@ -1,4 +1,4 @@
-module.exports = ({init, db}) => {
+module.exports = ({init, db, logger}) => {
 	const {checkLoggedIn, checkLoggedOut} = require('../middleware/authenticate')
 	const errorMessage = require('../error_message')
 	const Following = require('../model/following')
@@ -8,20 +8,18 @@ module.exports = ({init, db}) => {
 		let userId = req.query.userId
 
 		if (!userId || typeof(userId) !== 'number') {
-			//TODO: 400 or 404?
-			return res.status(404).json({
+			return res.status(400).json({
 				message: errorMessage.INVALID_QUERY_PARAMETER + ' (userId)'
 			})
 		}
 
 		try {
-			let users = []
 			const query = {user: userId}
-			const fields = 'followUser'
 			let count = await Following.count(query)
 
 			res.status(200).json({ data: count })
 		} catch (err) {
+			logger.error(err.message)
 			res.status(500).json({ message: err.message })
 		}
 	})
@@ -36,13 +34,12 @@ module.exports = ({init, db}) => {
 		}
 
 		try {
-			let users = []
-			const query = {followUser: userId}
-			const fields = 'user'
+			const query = {followUser: userId} //팔로우 유저가 자기자신인 것
 			let count = await Following.count(query)
 
 			res.status(200).json({ data: count })
 		} catch (err) {
+			logger.error(err.message)
 			res.status(500).json({ message: err.message })
 		}
 	})
@@ -68,7 +65,7 @@ module.exports = ({init, db}) => {
 		}
 
 		let users = []
-		const query = {user: userId}
+		const query = {user: userId} //유저가 자기자신인 것
 		const fields = 'followUser'
 		const options = { skip: skip, limit: limit, sort: 'date' }
 
@@ -77,11 +74,12 @@ module.exports = ({init, db}) => {
 			.populate('followUser')
 
 			followings.forEach(following => {
-				users.append(followings.followUser)
+				users.append(following.followUser)
 			})
 
 			res.status(200).json({ data: users })
 		} catch (err) {
+			logger.error(err.message)
 			res.status(500).json({ message: err.message })
 		}
 	})
@@ -98,16 +96,13 @@ module.exports = ({init, db}) => {
 			})
 		}
 
-		//HACK!!
 		if (!skip || typeof(skip) !== 'number') {
 			skip = 0
 		}
-		//HACK!!
 		if (!limit || typeof(limit) !== 'number') {
 			limit = 30
 		}
 
-		let followUsers = []
 		const query = {followUser: userId}
 		const fields = 'user'
 		const options = { skip: skip, limit: limit, sort: 'date' }
@@ -116,12 +111,9 @@ module.exports = ({init, db}) => {
 			let users = await Following.find(query, fields, options)
 			.populate('user')
 
-			followings.forEach(following => {
-				followUsers.append(followings.user)
-			})
-
-			res.status(200).json({ data: followUsers })
+			res.status(200).json({ data: users })
 		} catch (err) {
+			logger.error(err.message)
 			res.status(500).json({ message: err.message })
 		}
 	})
@@ -129,7 +121,6 @@ module.exports = ({init, db}) => {
 	//팔로우 추가
 	api.post('/', checkLoggedIn, async (req, res) => {
 		let userId = req.user._id
-		//HACK!!
 		let followUserId = req.query.followUserId
 
 		if (!followUserId || typeof(followUserId) !== 'number') {
@@ -144,8 +135,9 @@ module.exports = ({init, db}) => {
 				followUser: followUserId
 			})
 
-			res.status(200).json({ data: following })
+			res.status(201).json({ data: following })
 		} catch (err) {
+			logger.error(err.message)
 			res.status(500).json({ message: err.message })
 		}
 	})
@@ -166,6 +158,7 @@ module.exports = ({init, db}) => {
 
 			res.status(200).json({})
 		} catch (err) {
+			logger.error(err.message)
 			res.status(500).json({ message: err.message })
 		}
 	})

@@ -9,6 +9,6 @@ module.exports = ({app, init}) => {
       rolling: false,
       saveUninitialized: true,
       store: new MongooseStore({ connection: init.mongoUrl, mongoose: mongoose }),
-      cookie:{ maxAge:60*60*24*30,  httpOnly: true } // 30 days
+      cookie:{ maxAge:3000000000,  httpOnly: true } //약 30일 
   }));
 }

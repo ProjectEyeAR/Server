@@ -28,6 +28,7 @@ app.use(express.static('public'))
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
+
 //localhost:3001/api
 app.use('/api', routes)
 

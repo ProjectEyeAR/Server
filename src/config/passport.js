@@ -47,7 +47,7 @@ module.exports = ({app, init}) => {
     //TODO: 키 감추기!
     clientID: init.clientID,
     clientSecret: init.clientSecret,
-    callbackURL: "/api/auth/facebook/callback",
+    callbackURL: init.HerokuUrl + "/api/auth/facebook/callback",
     profileFields: [
       'id',
       'email',

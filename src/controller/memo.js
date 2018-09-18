@@ -1,14 +1,21 @@
-module.exports = ({init, db}) => {
+module.exports = ({
+  init,
+  db,
+  logger
+}) => {
   const errorMessage = require('../error_message')
   const Memo = require('../model/memo')
   const api = require('express').Router()
-  const {checkLoggedIn, checkLoggedOut} = require('../middleware/authenticate')
-  const upload = require('../services/file-upload')({init});
-  const logger = require('../config/logger')
+  const {
+    checkLoggedIn,
+    checkLoggedOut
+  } = require('../middleware/authenticate')
+  const upload = require('../services/file-upload')({
+    init
+  });
   const hashtagRegex = /#.[^\s\d\t\n\r\.\*\\`~!@#$%^&()\-=+[{\]}|;:'",<>\/?]+/g //ex: #tag1#tag2 => #tag#tag
-  //TODO follower, follwing
 
-  isEmpthy = o => {
+  const isEmpthy = o => {
     if (!o) {
       return true
     }
@@ -18,39 +25,53 @@ module.exports = ({init, db}) => {
     return false
   }
 
-  //테스트 필요함!
-  api.post('/findByTag', async(req, res) => {
-    if(!req.body.tag || req.body.tag === 'string') return
+  //주어진 tag가 속한 메모를 출력함
+  //@router: GET  http://localhost:3001/api/memo/findByTag
+  //@params: tag
+  api.get('/findByTag/:tag', async (req, res) => {
+    if (!req.body.tag || req.body.tag === 'string') {
+      return res.status(400).json({
+        message: errorMessage.INVALID_QUERY_PARAMETER + ' (userId)'
+      })
+    }
 
-    let tag = Array.from(req.body.tag)
+    let tag = req.params.tag
 
     try {
-      let memos = await Memo.find({})
-      .where('tags')
-      .in(tag)
-      .limit(30)
+      let memos = await Memo.find({
+          tags: tag
+        })
+        .limit(30)
 
-      res.status(200).json({ data: memos })
-    } catch(err) {
-      logger.error(err.message, err)
-      res.status(500).json({ message: err.message })
+      res.status(200).json({
+        data: memos
+      })
+    } catch (err) {
+      logger.error(err.message)
+      res.status(500).json({
+        message: err.message
+      })
     }
   })
-  
+
   //로그인된 유저에게 속한 모든 메모의 개수를 보여줌
   //@url: GET http://localhost:3001/api/memo/count
   api.get('/count', checkLoggedIn, async (req, res) => {
     try {
       let count = await Memo.find({})
-      .where('user')
-      .equals(req.user._id)
-      .count()
+        .where('user')
+        .equals(req.user._id)
+        .count()
 
-      res.status(200).json({ data: count })
+      res.status(200).json({
+        data: count
+      })
 
-    } catch(err) {
-      logger.error(err.message, err)
-      res.status(500).json({ message: err.message })
+    } catch (err) {
+      logger.error(err.message)
+      res.status(500).json({
+        message: err.message
+      })
     }
   })
 
@@ -85,11 +106,15 @@ module.exports = ({init, db}) => {
         .select('img loc')
         .limit(30)
 
-      res.status(200).json({ data: memos })
+      res.status(200).json({
+        data: memos
+      })
 
     } catch (err) {
-      logger.error(err.message, err)
-      res.status(500).json({ message: err.message })
+      logger.error(err.message)
+      res.status(500).json({
+        message: err.message
+      })
     }
   })
 
@@ -100,22 +125,26 @@ module.exports = ({init, db}) => {
       let memos = await Memo.find({})
         .where('user')
         .equals(req.user._id)
-        .sort('date')
+        .sort('date');
 
-      res.status(200).json({ data: memos })
+      res.status(200).json({
+        data: memos
+      })
 
     } catch (err) {
-      logger.error(err.message, err)
-      res.status(500).json({ message: err.message })
+      logger.error(err.message)
+      res.status(500).json({
+        message: err.message
+      })
     }
   })
-  
+
 
   //로그인된 유저의 메모를 추가함
   //@url POST http://localhost:3001/api/memo
   api.post('/', [checkLoggedIn, upload.single('img')], async (req, res) => {
     let hashtagsWithoutSharp = []
-    if (req.body.text) { 
+    if (req.body.text) {
       let hashtags = req.body.text.match(hashtagRegex)
       hashtags.forEach(hashtag => {
         hashtagsWithoutSharp.push(hashtag.substring(1))
@@ -129,18 +158,22 @@ module.exports = ({init, db}) => {
 
     try {
       let memo = await Memo.create({
-        img: location, 
+        img: location,
         text: req.body.text,
         loc: req.body.loc,
         tags: hashtagsWithoutSharp,
         user: req.user._id
       })
 
-      res.status(200).json({ data: memo })
+      res.status(201).json({
+        data: memo
+      })
 
     } catch (err) {
-      logger.error(err.message, err)
-      res.status(500).json({ message: err.message })
+      logger.error(err.message)
+      res.status(500).json({
+        message: err.message
+      })
     }
   })
 
@@ -149,14 +182,16 @@ module.exports = ({init, db}) => {
   api.delete('/', checkLoggedIn, async (req, res) => {
     try {
       await Memo.deleteMany()
-      .where('user')
-      .equals(req.user._id)
+        .where('user')
+        .equals(req.user._id)
 
       res.status(200).json({})
 
     } catch (err) {
-      logger.error(err.message, err)
-      res.status(500).json({ message: err.message })
+      logger.error(err.message)
+      res.status(500).json({
+        message: err.message
+      })
     }
   })
 
@@ -165,14 +200,16 @@ module.exports = ({init, db}) => {
   api.delete('/:id', checkLoggedIn, async (req, res) => {
     try {
       await Memo.where('_id')
-      .equals(req.params.id)
-      .deleteOne()
+        .equals(req.params.id)
+        .deleteOne()
 
       res.status(200).json({})
 
     } catch (err) {
-      logger.error(err.message, err)
-      res.status(500).json({ message: err.message })
+      logger.error(err.message)
+      res.status(500).json({
+        message: err.message
+      })
     }
   })
 
@@ -181,16 +218,18 @@ module.exports = ({init, db}) => {
   api.put('/:id/image', checkLoggedIn, async (req, res) => {
     try {
       await Memo.where('_id')
-      .equals(req.params.id)
-      .updateOne({
-        img: req.body.img,
-      })
+        .equals(req.params.id)
+        .updateOne({
+          img: req.body.img,
+        })
 
       res.status(200).json({})
-      
+
     } catch (err) {
-      logger.error(err.message, err)
-      res.status(500).json({ message: err.message })
+      logger.error(err.message)
+      res.status(500).json({
+        message: err.message
+      })
     }
   })
 
@@ -198,7 +237,7 @@ module.exports = ({init, db}) => {
   //@url: PUT http://localhost:3001/api/memo/5b8e3895e1d5b36e086078a2/text
   api.put('/:id/text', checkLoggedIn, async (req, res) => {
     let hashtagsWithoutSharp = []
-    if (req.body.tags) { 
+    if (req.body.tags) {
       let hashtags = req.body.text.match(hashtagRegex)
       hashtags.forEach(hashtag => {
         hashtagsWithoutSharp.push(hashtag.substring(1))
@@ -207,44 +246,21 @@ module.exports = ({init, db}) => {
 
     try {
       await Memo.where('_id')
-      .equals(req.params.id)
-      .updateOne({
-        text: req.body.text,
-        tags: hashtagsWithoutSharp
-      })
+        .equals(req.params.id)
+        .updateOne({
+          text: req.body.text,
+          tags: hashtagsWithoutSharp
+        })
 
       res.status(200).json({})
-      
+
     } catch (err) {
-      logger.error(err.message, err)
-      res.status(500).json({ message: err.message })
+      logger.error(err.message)
+      res.status(500).json({
+        message: err.message
+      })
     }
   })
-
-  //테스트 용, 더미 다큐먼트를 생성 후 콘솔창에 출력함
-  //@url: GET http://localhost:3001/api/memo/test
-  api.get('/test', checkLoggedIn, async (req, res) => {
-    Memo.create({
-      //TODO: 실제 서버에 저장되어있는 이미지 주소 쓰기
-      'img': 'Server\\Pictures\\i14182109167',
-      'text': 'Myself in seoul',
-      'loc': {
-        'type': 'Point',
-        'coordinates': [-80, 20]
-      },
-      'tags': ['#seoul', '#tour'],
-      'user': req.user._id
-    }, (err, o) => {
-      if (err) return console.log(err.message);
-      //위에서 생성한 메모를 가져옴
-      console.log(o);
-      //로그인이 되어있으면 유저 정보를 가져옴
-      //console.log(req.user);
-
-      res.status(200).json({message: o})
-    })
-  })
-
 
   return api
 }
