@@ -12,14 +12,9 @@ module.exports = ({router, init}) => {
     router.use('/memos', memo({init, db, logger}))
     //@url http://localhost:3001/api/auth
     router.use('/auth', auth({init, db}))
-<<<<<<< HEAD
     router.use('/followings', following({init, db, logger}))
     router.use('/users', user({init, db}))
     router.use('/comments', comments({init, db, logger}))
-=======
-    router.use('/followings', following({init, db}))
-    router.use('/users', user({init, db}))
->>>>>>> origin/master
   })
 
   return router

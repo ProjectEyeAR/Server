@@ -8,9 +8,10 @@ module.exports = ({db, init, logger}) => {
 	//@desc : 특정 메모에 속해있는 이모찌와 유저를 전부 가져옴
 	//@router : POST  http://localhost:3001/api/comments/:id
 	//@params : 
-	//id: String,
-	//skip: Number,
-	//limit: Number
+	/*	id: String,
+		skip: Number,
+		limit: Number
+	*/
 	api.get('/:id', async (req, res) => {
 		let targetMemoId = req.params.id
 		let skip = req.query.skip
@@ -42,9 +43,11 @@ module.exports = ({db, init, logger}) => {
 	//HACK!! 이미 추가됐는지 확인해야될까?
 	//@desc : 코멘트 추가
 	//@router : POST  http://localhost:3001/api/comments
-	//@params : 
-	//targetMemoId: String,
-	//emoji: String
+	//@params :
+	/* 
+		targetMemoId: String,
+		emoji: String
+	*/
 	api.post('/', checkLoggedIn, async (req, res) => {
 		let myUserId = req.user._id
 		let targetMemoId = req.body.targetMemoId
