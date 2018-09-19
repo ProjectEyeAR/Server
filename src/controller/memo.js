@@ -221,6 +221,7 @@ module.exports = ({
         .equals(req.params.id)
         .updateOne({
           img: req.body.img,
+          date: Date.now()
         })
 
       res.status(200).json({})
@@ -249,7 +250,8 @@ module.exports = ({
         .equals(req.params.id)
         .updateOne({
           text: req.body.text,
-          tags: hashtagsWithoutSharp
+          tags: hashtagsWithoutSharp,
+          date: Date.now()
         })
 
       res.status(200).json({})

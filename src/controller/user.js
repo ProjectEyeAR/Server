@@ -5,7 +5,11 @@ module.exports = ({init, db}) => {
 	const api = require('express').Router()
 
 	// TODO: profile 삭제, 추가, 가져오기 구현
-
+	api.post('/profile', checkLoggedIn, (req, res) => {
+		let profile = req.body.profile
+		let myUserId = req.user._id
+		
+	})
 
 	//회원가입
   	api.post('/', (req, res) => {
