@@ -8,7 +8,8 @@ module.exports = ({app, init}) => {
       resave: false,
       rolling: false,
       saveUninitialized: true,
+      maxAge: Date.now() + (30 * 86400 * 1000),
       store: new MongooseStore({ connection: init.mongoUrl, mongoose: mongoose }),
-      cookie:{ maxAge:3000000000,  httpOnly: true } //약 30일 
+      cookie:{ maxAge:Date.now() + (30 * 86400 * 1000),  httpOnly: true } 
   }));
 }

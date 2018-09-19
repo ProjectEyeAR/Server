@@ -1,27 +1,27 @@
 
-# Server 기능 명세서
+# 서울시앱공모전  Server-side 
 ## Start up
 1. *yarn dev* or *npm run dev*
-2. At First, sign up.
+2. At First, sign up your account to the server.
 
-> POST http://localhost:3001/api/auth/register
+> POST http://localhost:3001/api/users
 
-       {
+     {
     	  "email": "test@test1.com",
     	  "password": "1234",
     	  "displayName": "wfr112",
     	  "phoneNumber": "010-0001-0000"
-       }
+     }
 
 3. Login.
->POST http://localhost:3001/api/auth/login
 
-       {
-    	  "email": "test@test1.com",
-    	  "password": "1234"
-       }
+>POST http://localhost:3001/api/auth/session
 
-4. Check whether you are loged in.
+    {
+          "email": "test@test1.com",
+          "password": "1234"
+    }
+4. Check whether you were log in.
  >GET http://localhost:3001/api/auth/me
 
        {
@@ -39,115 +39,85 @@
            "success": true
     }
 
-5. Test
->GET  http://localhost:3001/api/memo/test
-
-       {
-         "message": {
-             "tag": [
-                 "seoul",
-                 "tour"
-             ],
-             "_id": "5b8e7adbd5394a5d7407e3b5",
-             "imgUrl": "Server\\Pictures\\i14182109167",
-             "text": "Myself in seoul",
-             "loc": {
-                  "type": "Point",
-                  "coordinates": [
-                      -80,
-                      20
-                 ],
-                  "_id": "5b8e7adbd5394a5d7407e3b6"
-              },
-              "user": "5b8e4249f9f8184d0c825c6a",
-              "date": "2018-09-04T12:30:19.797Z",
-              "__v": 0
-         },
-          "success": true
-       }
-
 ## Routers
-**Auth**<br>
+
+Auth
+
+
+----------
+
+
 SignUp
 
->POST http://localhost:3001/api/auth/register
-
-    {
-    	"email": "test@test1.com",
-    	"password": "1234",
-    	"displayName": "wfr112",
-    	"phoneNumber": "010-0001-0000"
-    }
+>POST http://localhost:3001/api/users
+> req:
+> 
+> { 	"email": "test@test1.com", 	"password": "1234", 	"displayName":
+> "wfr112", 	"phoneNumber": "010-0001-0000" }
+> res:
+> 
+> {
+>     "data": {
+>         "_id": "5ba1faf6b81deb3f7cef3883",
+>         "authId": "local:test@test1.com",
+>         "email": "test@test1.com",
+>         "password": "gaTQ8TE2pyjzfoN4bODTubGuUs3ZGS8EX6VmaDjecoprT69l+lYqTc1Lm5o81fjexjperiv/qEXHzhNChdZo93jpw1jIIPp87GBQutymkwhUnUtol2Mu3GOpU5CIVrz9slLNYtQQr0KRefBCyY4R8an9Jz0Y0gEjNMWD6DXTiys=",
+>         "salt": "lS6SroxxhbGnEc4bi5S/5zmeAacArMVgNhtcddH/xSS8T8WKw5jqzoaKLMzUXPkzBkPkOGIIaZ56XLpcjSxJrw==",
+>         "displayName": "wfr112",
+>         "phoneNumber": "010-0001-0000",
+>         "date": "2018-09-19T07:29:58.787Z",
+>         "__v": 0
+>     } }
 
 Login
 
->POST http://localhost:3001/api/auth/login
-
-    { 	"email": "test@test1.com",  "password": "1234" }
+>POST http://localhost:3001/api/auth/session
+> req:
+>     { 	"email": "test@test1.com",  "password": "1234" } res: {
+>     "data": {
+>         "_id": "5ba1faf6b81deb3f7cef3883",
+>         "authId": "local:test@test1.com",
+>         "email": "test@test1.com",
+>         "password": "gaTQ8TE2pyjzfoN4bODTubGuUs3ZGS8EX6VmaDjecoprT69l+lYqTc1Lm5o81fjexjperiv/qEXHzhNChdZo93jpw1jIIPp87GBQutymkwhUnUtol2Mu3GOpU5CIVrz9slLNYtQQr0KRefBCyY4R8an9Jz0Y0gEjNMWD6DXTiys=",
+>         "salt": "lS6SroxxhbGnEc4bi5S/5zmeAacArMVgNhtcddH/xSS8T8WKw5jqzoaKLMzUXPkzBkPkOGIIaZ56XLpcjSxJrw==",
+>         "displayName": "wfr112",
+>         "phoneNumber": "010-0001-0000",
+>         "date": "2018-09-19T07:29:58.787Z",
+>         "__v": 0
+>     } }
 
 Logout
->GET http://localhost:3001/api/auth/logout
->
+
+>GET http://localhost:3001/api/auth/session
+>req: 
+>res:  {}
+
+
 Me
 
 >GET http://localhost:3001/api/auth/me
-<hr>
-
-**Memo**<br>
-Update
->PUT http://localhost:3001/api/memo/5b8e3895e1d5b36e086078a2
-
-Delete a document
->DELETE http://localhost:3001/api/memo/5b8e3895e1d5b36e086078a2
-
-    //Response
-        {
-            "message": "Successfully deleted one document belongs to a logged in user",
-            "success": true
-        }
-
-Delete All
-
->DELETE http://localhost:3001/api/memo
-	
-	//Response
-    {
-        "message": "Successfully deleted all documents belongs to a logged in user",
-        "success": true
+>req:
+>res:
+>{
+    "data": {
+        "_id": "5ba1faf6b81deb3f7cef3883",
+        "authId": "local:test@test1.com",
+        "email": "test@test1.com",
+        "password": "gaTQ8TE2pyjzfoN4bODTubGuUs3ZGS8EX6VmaDjecoprT69l+lYqTc1Lm5o81fjexjperiv/qEXHzhNChdZo93jpw1jIIPp87GBQutymkwhUnUtol2Mu3GOpU5CIVrz9slLNYtQQr0KRefBCyY4R8an9Jz0Y0gEjNMWD6DXTiys=",
+        "salt": "lS6SroxxhbGnEc4bi5S/5zmeAacArMVgNhtcddH/xSS8T8WKw5jqzoaKLMzUXPkzBkPkOGIIaZ56XLpcjSxJrw==",
+        "displayName": "wfr112",
+        "phoneNumber": "010-0001-0000",
+        "date": "2018-09-19T07:29:58.787Z",
+        "__v": 0
     }
+}
 
-Add
->POST  http://localhost:3001/api/memo
+Memo
 
-    //Request
-    {
-    	"imgUrl": "Server\\Pictures\\i14182109167",
-    	"text": "Myself in seoul",
-    	"tag": ["seoul", "tour"],
-    	"loc" : {"type": "point", "coordinates": [-80, 25.791]}
-    }
-    
-    //Response
-    {
-        "message": {
-            "tag": [
-                "seoul",
-                "tour"
-            ],
-            "_id": "5b8e81f5598365013cff2417",
-            "imgUrl": "Server\\Pictures\\i14182109167",
-            "text": "Myself in seoul",
-            "loc": {
-                "type": "Point",
-                "coordinates": [
-                    -40,
-                    20
-                ],
-                "_id": "5b8e81f5598365013cff2418"
-            },
-            "user": "5b8e4249f9f8184d0c825c6a",
-            "date": "2018-09-04T13:00:37.832Z",
-            "__v": 0
-        },
-        "success": true
-    }
+----------
+
+User
+
+----------
+
+

@@ -1,16 +1,17 @@
-module.exports = ({init, db}) => {
-  const User = require('../model/user')
+module.exports = ({
+  init,
+  db
+}) => {
   //@passport
   const passport = require('passport')
-  const LocalStrategy = require('passport-local').Strategy;
+  require('passport-local').Strategy;
   const api = require('express').Router()
-  //@security
-  const bkfd2Password = require('pbkdf2-password');
-  const hasher = bkfd2Password();
-  const {checkLoggedIn, checkLoggedOut} = require('../middleware/authenticate')
+  const {
+    checkLoggedIn
+  } = require('../middleware/authenticate')
 
   //POST login 실패시 failureRedircet에 의해 작동되는 라우터
-  api.get('/session', (req, res) => {
+  api.get('/session/fail', (req, res) => {
     if (req.flash)
       return res.status(400).json({
         message: req.flash('error')[0]
@@ -24,10 +25,12 @@ module.exports = ({init, db}) => {
   */
   api.post('/session', passport.authenticate('local', {
     session: true,
-    failureRedirect: '/api/auth/session',
+    failureRedirect: '/api/auth/session/fail',
     failureFlash: true
   }), (req, res) => {
-    res.status(200).json({data: req.user})
+    res.status(200).json({
+      data: req.user
+    })
   })
 
   api.get('/session', (req, res) => {
@@ -35,14 +38,15 @@ module.exports = ({init, db}) => {
     res.status(200).json({})
   })
 
-  api.get('/me', checkLoggedIn, (req, res) => {
-    res.status(401).json({data: req.user})
-  })
-
   //@facebook router
-  api.get('/facebook', passport.authenticate('facebook', {scope: 'read_stream'}));
+  api.get('/facebook', passport.authenticate('facebook', {
+    scope: 'read_stream'
+  }));
 
-  api.get('/facebook/callback', passport.authenticate('facebook', {failureRedirect: '/login', successRedirect: '/me'}));
+  api.get('/facebook/callback', passport.authenticate('facebook', {
+    failureRedirect: '/login',
+    successRedirect: '/me'
+  }));
 
   return api
 }

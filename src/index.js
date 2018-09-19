@@ -6,14 +6,13 @@ const router = express.Router()
 const routes = require('./routes')({router, init})
 const bodyParser = require('body-parser')
 //@development
-const dev = require('./config/development')(app)
+require('./config/development')(app)
 //@production
-const prod = require('./config/production')(app)
-//require('express-async-errors')
+require('./config/production')(app)
 //@session
-const session = require('./config/session')({app, init})
+require('./config/session')({app, init})
 //@passport
-const passport = require('./config/passport')({app, init})
+require('./config/passport')({app, init})
 const flash = require('connect-flash')
 const cookieParser = require('cookie-parser')
 //@security
@@ -28,8 +27,6 @@ app.use(express.static('public'))
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
-
-//localhost:3001/api
 app.use('/api', routes)
 
 app.listen(init.port, () => {

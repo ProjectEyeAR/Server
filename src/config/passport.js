@@ -43,8 +43,8 @@ module.exports = ({app, init}) => {
     });
   }));
 
+  //TODO: facebook 연동
   passport.use(new FacebookStrategy({
-    //TODO: 키 감추기!
     clientID: init.clientID,
     clientSecret: init.clientSecret,
     callbackURL: init.HerokuUrl + "/api/auth/facebook/callback",
