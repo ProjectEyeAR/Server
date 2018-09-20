@@ -15,7 +15,9 @@ module.exports = ({
 	const User = require('../model/user')
 	const api = require('express').Router()
 	const hasher = require('pbkdf2-password')()
-	const phoneNumberRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3,4}[-\s\.]?[0-9]{4,6}$/im
+	const EMAIL_REGEX = /^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])$/
+	const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/
+	const DISPLAY_NAME_REGEX = /^[^\s\t\n\r\`\~\!\@\#\$\%\^\&\*\(\)\+\=\[\]\\\{\}\|\;\'\:\"\,\.\/\<\>\?]+$/
 	/* The following REGEX will validate any of these formats:
 	/* (123) 456-7890
 	/* 123-456-7890
@@ -31,7 +33,6 @@ module.exports = ({
 	/*email: String, 
 	/*password: String, 
 	/*displayName: String, 
-	/*phoneNumber: String, 
 	/*img: Object
 	*/
 	api.post('/', (req, res) => {
@@ -42,49 +43,27 @@ module.exports = ({
 				})
 			}
 
-			let img = req.file
 			let email = req.body.email
 			let password = req.body.password
 			let displayName = req.body.displayName
-			let phoneNumber = req.body.phoneNumber
 
-			if (check.not.object(img)) {
-				return res.status(400).json({
-					message: errorMessage.INVALID_POST_REQUEST + ' (file)'
-				})
-			}
-
-			if (check.not.string(email)) {
+			if (check.not.string(email) || !EMAIL_REGEX.test(email)) {
 				return res.status(400).json({
 					message: errorMessage.INVALID_POST_REQUEST + ' (email)'
 				})
 			}
 
-			if (check.not.string(password)) {
+			if (check.not.string(password) || !PASSWORD_REGEX.test(password)) {
 				return res.status(400).json({
 					message: errorMessage.INVALID_POST_REQUEST + ' (password)'
 				})
 			}
 
-			if (check.not.string(displayName)) {
+			if (check.not.string(displayName) || !DISPLAY_NAME_REGEX.test(displayName)) {
 				return res.status(400).json({
 					message: errorMessage.INVALID_POST_REQUEST + ' (displayName)'
 				})
 			}
-
-			if (check.not.string(phoneNumber)) {
-				return res.status(400).json({
-					message: errorMessage.INVALID_POST_REQUEST + ' (phoneNumber)'
-				})
-			}
-
-			phoneNumber = phoneNumber.match(phoneNumberRegex)
-			if (check.not.array(phoneNumber)) {
-				return res.status(400).json({
-					message: errorMessage.INVALID_POST_REQUEST + ' (phoneNumber)'
-				})
-			}
-			phoneNumber.join('')
 
 			return hasher({
 				password: password
@@ -102,8 +81,6 @@ module.exports = ({
 					password: hash,
 					salt: salt,
 					displayName: displayName,
-					phoneNumber: phoneNumber,
-					profile: img.location
 				})
 
 				await newUser.save((err, newUser) => {
@@ -185,7 +162,6 @@ module.exports = ({
 	/*email: String, 
 	/*password: String, 
 	/*displayName: String, 
-	/*phoneNumber: String, 
 	/*img: Object
 	*/
 	api.put('/', checkLoggedIn, (req, res) => {
@@ -201,7 +177,6 @@ module.exports = ({
 			let email = req.body.email
 			let password = req.body.password
 			let displayName = req.body.displayName
-			let phoneNumber = req.body.phoneNumber
 
 			if (check.not.object(img)) {
 				return res.status(400).json({
@@ -209,37 +184,23 @@ module.exports = ({
 				})
 			}
 
-			if (check.not.string(email)) {
+			if (check.not.string(email) || !EMAIL_REGEX.test(email)) {
 				return res.status(400).json({
 					message: errorMessage.INVALID_POST_REQUEST + ' (email)'
 				})
 			}
 
-			if (check.not.string(password)) {
+			if (check.not.string(password) || !PASSWORD_REGEX.test(password)) {
 				return res.status(400).json({
 					message: errorMessage.INVALID_POST_REQUEST + ' (password)'
 				})
 			}
 
-			if (check.not.string(displayName)) {
+			if (check.not.string(displayName) || !DISPLAY_NAME_REGEX.test(displayName)) {
 				return res.status(400).json({
 					message: errorMessage.INVALID_POST_REQUEST + ' (displayName)'
 				})
 			}
-
-			if (check.not.string(phoneNumber)) {
-				return res.status(400).json({
-					message: errorMessage.INVALID_POST_REQUEST + ' (phoneNumber)'
-				})
-			}
-
-			phoneNumber = phoneNumber.match(phoneNumberRegex)
-			if (check.not.array(phoneNumber)) {
-				return res.status(400).json({
-					message: errorMessage.INVALID_POST_REQUEST + ' (phoneNumber)'
-				})
-			}
-			phoneNumber.join('')
 
 			return hasher({
 				password: password
@@ -261,7 +222,6 @@ module.exports = ({
 						password: hash,
 						salt: salt,
 						displayName: displayName,
-						phoneNumber: phoneNumber,
 						profile: img.location
 					}
 				}
@@ -315,7 +275,6 @@ module.exports = ({
 					password: hash,
 					salt: salt,
 					displayName: displayName,
-					phoneNumber: phoneNumber,
 					profile: img.location
 				}
 			}
