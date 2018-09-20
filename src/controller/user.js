@@ -35,7 +35,7 @@ module.exports = ({
 	/*displayName: String, 
 	/*img: Object
 	*/
-	api.post('/', (req, res) => {
+	api.post('/', async (req, res) => {
 		let email = req.body.email
 		let password = req.body.password
 		let displayName = req.body.displayName
