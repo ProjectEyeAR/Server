@@ -58,13 +58,18 @@ module.exports = ({
 			})
 		}			
 
-		const emailQuery = { 'email': email }
-		let emailCount = await User.count(emailQuery)
+		try {
+			const emailQuery = { 'email': email }
+			let emailCount = await User.count(emailQuery)
 
-		if (emailCount > 0) {
-			return res.status(409).json({
-				message: errorMessage.CONFLICT_PARAMETER + ' (email)'
-			})
+			if (emailCount > 0) {
+				return res.status(409).json({
+					message: errorMessage.CONFLICT_PARAMETER + ' (email)'
+				})
+			}
+		} catch (err) {
+			logger.error(err.message)
+			res.status(500).json({ message: err.message })
 		}
 
 		return hasher({
