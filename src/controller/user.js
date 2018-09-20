@@ -36,64 +36,65 @@ module.exports = ({
 	/*img: Object
 	*/
 	api.post('/', (req, res) => {
-		single(req, res, function (err) {
+		let email = req.body.email
+		let password = req.body.password
+		let displayName = req.body.displayName
+
+		if (check.not.string(email) || !EMAIL_REGEX.test(email)) {
+			return res.status(400).json({
+				message: errorMessage.INVALID_POST_REQUEST + ' (email)'
+			})
+		}
+
+		if (check.not.string(password) || !PASSWORD_REGEX.test(password)) {
+			return res.status(400).json({
+				message: errorMessage.INVALID_POST_REQUEST + ' (password)'
+			})
+		}
+
+		if (check.not.string(displayName) || !DISPLAY_NAME_REGEX.test(displayName)) {
+			return res.status(400).json({
+				message: errorMessage.INVALID_POST_REQUEST + ' (displayName)'
+			})
+		}			
+
+		const emailQuery = { 'email': email }
+		let emailCount = await User.count(emailQuery)
+
+		if (emailCount > 0) {
+			return res.status(409).json({
+				message: errorMessage.CONFLICT_PARAMETER + ' (email)'
+			})
+		}
+
+		return hasher({
+			password: password
+		}, async function (err, pass, salt, hash) {
 			if (err) {
-				return res.status(400).json({
-					message: errorMessage.UNEXPECTED_FIELD_ERROR + ' (img)'
+				logger.error(err.message)
+				return res.status(500).json({
+					message: err.message
 				})
 			}
 
-			let email = req.body.email
-			let password = req.body.password
-			let displayName = req.body.displayName
+			let newUser = new User({
+				authId: 'local:' + email,
+				email: email,
+				password: hash,
+				salt: salt,
+				displayName: displayName,
+			})
 
-			if (check.not.string(email) || !EMAIL_REGEX.test(email)) {
-				return res.status(400).json({
-					message: errorMessage.INVALID_POST_REQUEST + ' (email)'
-				})
-			}
-
-			if (check.not.string(password) || !PASSWORD_REGEX.test(password)) {
-				return res.status(400).json({
-					message: errorMessage.INVALID_POST_REQUEST + ' (password)'
-				})
-			}
-
-			if (check.not.string(displayName) || !DISPLAY_NAME_REGEX.test(displayName)) {
-				return res.status(400).json({
-					message: errorMessage.INVALID_POST_REQUEST + ' (displayName)'
-				})
-			}
-
-			return hasher({
-				password: password
-			}, async function (err, pass, salt, hash) {
+			await newUser.save((err, newUser) => {
 				if (err) {
 					logger.error(err.message)
 					return res.status(500).json({
 						message: err.message
 					})
-				}
-
-				let newUser = new User({
-					authId: 'local:' + email,
-					email: email,
-					password: hash,
-					salt: salt,
-					displayName: displayName,
-				})
-
-				await newUser.save((err, newUser) => {
-					if (err) {
-						logger.error(err.message)
-						return res.status(500).json({
-							message: err.message
-						})
-					} else
-						return res.status(201).json({
-							data: newUser
-						})
-				})
+				} else
+					return res.status(201).json({
+						data: newUser
+					})
 			})
 		})
 	})
