@@ -59,16 +59,10 @@ module.exports = ({
 		emoji: String,
 		memoId: String
 	*/
-	api.post('/', [checkLoggedIn, checkEmoji], async (req, res) => {
+	api.post('/', checkLoggedIn, async (req, res) => {
 		let myUserId = req.user._id
 		let memoId = req.body.memoId
 		let emoji = req.body.emoji
-
-		if (check.not.string(memoId)) {
-			return res.status(404).json({
-				message: errorMessage.INVALID_POST_REQUEST + ' (memoId)'
-			})
-		}
 
 		try {
 			let query = {

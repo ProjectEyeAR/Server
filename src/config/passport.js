@@ -64,18 +64,19 @@ module.exports = ({
   passport.use(new FacebookStrategy({
     clientID: init.clientID,
     clientSecret: init.clientSecret,
-    callbackURL: "http://localhost:3001/api/auth/facebook/callback",
-    profileFields: ['email', 'displayName']
+    callbackURL: "/api/auth/facebook/callback",
+    profileFields: ['id', 'name', 'email', 'displayName']
   }, async function (accessToken, refreshToken, profile, done) {
     let authId = 'facebook:' + profile.id
 
+    console.log(profile)
     let filter = {
       authId: authId
     }
     let update = {
       $set: {
         authId: authId,
-        email: profile.emails[0],
+        email: profile.emails[0].value,
         displayName: profile.displayName
       }
     }
@@ -86,16 +87,10 @@ module.exports = ({
 
     try {
       let user = await User.findOneAndUpdate(filter, update, option)
-
-      if (user) {
-        return done(null, user)
-      }
+      return done(null, user)
 
     } catch (err) {
-      logger.error(err.message)
-      return res.status(500).json({
-        message: err.message
-      })
+      return done(err)
     }
   }))
 }
