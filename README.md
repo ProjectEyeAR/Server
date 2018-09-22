@@ -41,7 +41,7 @@
 
 ## Routers
 
-Auth
+**Auth**
 
 
 ----------
@@ -56,25 +56,25 @@ SignUp
 > "wfr112", 	"phoneNumber": "010-0001-0000" }
 > res:
 > 
-> {
->     "data": {
->         "_id": "5ba1faf6b81deb3f7cef3883",
->         "authId": "local:test@test1.com",
->         "email": "test@test1.com",
->         "password": "gaTQ8TE2pyjzfoN4bODTubGuUs3ZGS8EX6VmaDjecoprT69l+lYqTc1Lm5o81fjexjperiv/qEXHzhNChdZo93jpw1jIIPp87GBQutymkwhUnUtol2Mu3GOpU5CIVrz9slLNYtQQr0KRefBCyY4R8an9Jz0Y0gEjNMWD6DXTiys=",
->         "salt": "lS6SroxxhbGnEc4bi5S/5zmeAacArMVgNhtcddH/xSS8T8WKw5jqzoaKLMzUXPkzBkPkOGIIaZ56XLpcjSxJrw==",
->         "displayName": "wfr112",
->         "phoneNumber": "010-0001-0000",
->         "date": "2018-09-19T07:29:58.787Z",
->         "__v": 0
->     } }
+>     {
+>         "data": {
+>             "_id": "5ba1faf6b81deb3f7cef3883",
+>             "authId": "local:test@test1.com",
+>             "email": "test@test1.com",
+>             "password": "gaTQ8TE2pyjzfoN4bODTubGuUs3ZGS8EX6VmaDjecoprT69l+lYqTc1Lm5o81fjexjperiv/qEXHzhNChdZo93jpw1jIIPp87GBQutymkwhUnUtol2Mu3GOpU5CIVrz9slLNYtQQr0KRefBCyY4R8an9Jz0Y0gEjNMWD6DXTiys=",
+>             "salt": "lS6SroxxhbGnEc4bi5S/5zmeAacArMVgNhtcddH/xSS8T8WKw5jqzoaKLMzUXPkzBkPkOGIIaZ56XLpcjSxJrw==",
+>             "displayName": "wfr112",
+>             "phoneNumber": "010-0001-0000",
+>             "date": "2018-09-19T07:29:58.787Z",
+>             "__v": 0
+>         } }
 
 Login
 
 >POST http://localhost:3001/api/auth/session
 > req:
->     { 	"email": "test@test1.com",  "password": "1234" } res: {
->     "data": {
+> 
+>     { 	"email": "test@test1.com",  "password": "1234" } res: { "data": {
 >         "_id": "5ba1faf6b81deb3f7cef3883",
 >         "authId": "local:test@test1.com",
 >         "email": "test@test1.com",
@@ -83,8 +83,7 @@ Login
 >         "displayName": "wfr112",
 >         "phoneNumber": "010-0001-0000",
 >         "date": "2018-09-19T07:29:58.787Z",
->         "__v": 0
->     } }
+>         "__v": 0 } }
 
 Logout
 
@@ -95,28 +94,34 @@ Logout
 
 Me
 
->GET http://localhost:3001/api/auth/me
+>GET http://localhost:3001/api/users/me
 >req:
 >res:
->{
-    "data": {
-        "_id": "5ba1faf6b81deb3f7cef3883",
-        "authId": "local:test@test1.com",
-        "email": "test@test1.com",
-        "password": "gaTQ8TE2pyjzfoN4bODTubGuUs3ZGS8EX6VmaDjecoprT69l+lYqTc1Lm5o81fjexjperiv/qEXHzhNChdZo93jpw1jIIPp87GBQutymkwhUnUtol2Mu3GOpU5CIVrz9slLNYtQQr0KRefBCyY4R8an9Jz0Y0gEjNMWD6DXTiys=",
-        "salt": "lS6SroxxhbGnEc4bi5S/5zmeAacArMVgNhtcddH/xSS8T8WKw5jqzoaKLMzUXPkzBkPkOGIIaZ56XLpcjSxJrw==",
-        "displayName": "wfr112",
-        "phoneNumber": "010-0001-0000",
-        "date": "2018-09-19T07:29:58.787Z",
-        "__v": 0
-    }
-}
+> 
+>     {
+>         "data": {
+>             "_id": "5ba1faf6b81deb3f7cef3883",
+>             "authId": "local:test@test1.com",
+>             "email": "test@test1.com",
+>             "password": "gaTQ8TE2pyjzfoN4bODTubGuUs3ZGS8EX6VmaDjecoprT69l+lYqTc1Lm5o81fjexjperiv/qEXHzhNChdZo93jpw1jIIPp87GBQutymkwhUnUtol2Mu3GOpU5CIVrz9slLNYtQQr0KRefBCyY4R8an9Jz0Y0gEjNMWD6DXTiys=",
+>             "salt": "lS6SroxxhbGnEc4bi5S/5zmeAacArMVgNhtcddH/xSS8T8WKw5jqzoaKLMzUXPkzBkPkOGIIaZ56XLpcjSxJrw==",
+>             "displayName": "wfr112",
+>             "phoneNumber": "010-0001-0000",
+>             "date": "2018-09-19T07:29:58.787Z",
+>             "__v": 0
+>         } }
 
-Memo
+**Memo**
 
 ----------
 
-User
+	
+**Comment**
+
+----------
+
+
+**User**
 
 ----------
 

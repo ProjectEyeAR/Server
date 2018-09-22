@@ -10,6 +10,7 @@ module.exports = ({
 	const errorMessage = require('../error_message')
 	const api = require('express').Router()
 	const Comment = require('../model/comment')
+	const {checkEmoji} = require('../middleware/typeCheck')
 
 	//@desc : 특정 메모에 속해있는 이모찌와 유저를 전부 가져옴
 	//@router : POST http://localhost:3001/api/comments/:id
@@ -58,22 +59,10 @@ module.exports = ({
 		emoji: String,
 		memoId: String
 	*/
-	api.post('/', checkLoggedIn, async (req, res) => {
+	api.post('/', [checkLoggedIn, checkEmoji], async (req, res) => {
 		let myUserId = req.user._id
 		let memoId = req.body.memoId
 		let emoji = req.body.emoji
-
-		if (check.not.string(id)) {
-			return res.status(404).json({
-				message: errorMessage.INVALID_POST_REQUEST + ' (id)'
-			})
-		}
-
-		if (check.not.string(emoji)) {
-			return res.status(404).json({
-				message: errorMessage.INVALID_POST_REQUEST + ' (emoji)'
-			})
-		}
 
 		if (check.not.string(memoId)) {
 			return res.status(404).json({

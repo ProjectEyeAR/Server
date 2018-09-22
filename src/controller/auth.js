@@ -39,14 +39,21 @@ module.exports = ({
   })
 
   //@facebook router
-  api.get('/facebook', passport.authenticate('facebook', {
-    scope: 'read_stream'
-  }));
+  api.get('/facebook', passport.authenticate('facebook'))
 
   api.get('/facebook/callback', passport.authenticate('facebook', {
-    failureRedirect: '/login',
-    successRedirect: '/me'
-  }));
+    successRedirect: '/api/auth/facebook/',
+    failureRedirect: '/api/auth/facebook/fail',
+    failureFlash: true
+  }))
+
+
+  api.get('/facebook/fail', (req, res) => {
+    if (req.flash)
+      return res.status(400).json({
+        message: req.flash('error')[0]
+      })
+  })
 
   return api
 }
