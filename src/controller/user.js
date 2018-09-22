@@ -35,6 +35,7 @@ module.exports = ({
 		let email = req.body.email
 		let password = req.body.password
 		let displayName = req.body.displayName
+		let img = req.file
 
 		return hasher({
 			password: password
@@ -50,6 +51,7 @@ module.exports = ({
 				authId: 'local:' + email,
 				email: email,
 				password: hash,
+				profile: img.location,
 				salt: salt,
 				displayName: displayName,
 			})
