@@ -2,9 +2,9 @@ module.exports = ({
   init,
   db,
   logger,
-  check
+  check,
+  errorMessage 
 }) => {
-  const errorMessage = require('../error_message')
   const Memo = require('../model/memo')
   const api = require('express').Router()
   const {

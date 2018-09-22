@@ -1,6 +1,7 @@
 module.exports = ({
   init,
-  db
+  db,
+  errorMessage
 }) => {
   //@passport
   const passport = require('passport')
@@ -48,7 +49,7 @@ module.exports = ({
 
 
   api.get('/facebook/fail', (req, res) => {
-    return res.status(500).json({"test": "test"})
+    return res.status(500).json({message: errorMessage.FACEBOOK_LOGIN_FAIL})
   })
 
   return api

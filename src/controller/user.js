@@ -2,12 +2,12 @@ module.exports = ({
 	init,
 	db,
 	logger,
-	check
+	check,
+	errorMessage
 }) => {
 	const {
 		checkLoggedIn
 	} = require('../middleware/authenticate')
-	const errorMessage = require('../error_message')
 	const User = require('../model/user')
 	const api = require('express').Router()
 	const hasher = require('pbkdf2-password')()

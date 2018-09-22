@@ -2,12 +2,12 @@ module.exports = ({
 	db,
 	init,
 	logger,
-	check
+	check,
+	errorMessage
 }) => {
 	const {
 		checkLoggedIn
 	} = require('../middleware/authenticate')
-	const errorMessage = require('../error_message')
 	const api = require('express').Router()
 	const Comment = require('../model/comment')
 	const {checkEmoji} = require('../middleware/typeCheck')

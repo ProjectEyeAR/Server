@@ -8,12 +8,12 @@ module.exports = ({
   const User = require('../model/user')
   const bkfd2Password = require("pbkdf2-password")
   const hasher = bkfd2Password()
-
+  const errorMessage = require('../error_message')
+  
   app.use(passport.initialize())
   app.use(passport.session())
 
   passport.serializeUser(function (user, done) {
-    console.log(user.id)
     done(null, user.id)
   })
 
@@ -60,7 +60,6 @@ module.exports = ({
     }
   }))
 
-  //TODO: facebook 연동
   passport.use(new FacebookStrategy({
     clientID: init.clientID,
     clientSecret: init.clientSecret,
@@ -69,7 +68,6 @@ module.exports = ({
   }, async function (accessToken, refreshToken, profile, done) {
     let authId = 'facebook:' + profile.id
 
-    console.log(profile)
     let filter = {
       authId: authId
     }
@@ -82,7 +80,7 @@ module.exports = ({
     }
     let option = {
       new: true,
-      upsert: true //업데이트된 데이터가 출력됨, 없으면 생성
+      upsert: true 
     }
 
     try {

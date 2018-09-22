@@ -7,13 +7,14 @@ module.exports = ({router, init}) => {
   const comments = require('../controller/comment')
   const logger = require('../config/logger')(init)
   const check = require('check-types')
+  const errorMessage = require('../error_message')
 
   initializeDB(db => {
-    router.use('/memos', memo({init, db, logger, check}))
-    router.use('/auth', auth({init, db, logger, check}))
-    router.use('/followings', following({init, db, logger, check}))
-    router.use('/users', user({init, db, logger, check}))
-    router.use('/comments', comments({init, db, logger, check}))
+    router.use('/memos', memo({init, db, logger, check, errorMessage}))
+    router.use('/auth', auth({init, db, logger, check, errorMessage}))
+    router.use('/followings', following({init, db, logger, check, errorMessage}))
+    router.use('/users', user({init, db, logger, check, errorMessage}))
+    router.use('/comments', comments({init, db, logger, check, errorMessage}))
   })
 
   return router
