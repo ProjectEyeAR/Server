@@ -1,6 +1,5 @@
 module.exports = ({
     logger,
-    User,
     init
 }) => {
     const upload = require('../services/file-upload')({
@@ -10,10 +9,11 @@ module.exports = ({
 
     const errorMessage = require('../error_message')
     const check = require('check-types')
-
+    const User = require('../model/user')
     const EMAIL_REGEX = /^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])$/
     const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/
     const DISPLAY_NAME_REGEX = /^[^\s\t\n\r\`\~\!\@\#\$\%\^\&\*\(\)\+\=\[\]\\\{\}\|\;\'\:\"\,\.\/\<\>\?]+$/
+    const hashtagRegex = /#.[^\s\d\t\n\r\.\*\\`~!@#$%^&()\-=+[{\]}|;:'",<>\/?]+/g //ex: #tag1#tag2 => #tag#tag HACK!! 1글자 안됨 ex) #a#b#c
 
     const checkEmoji = function (req, res, next) {
         let emoji = req.body.emoji
@@ -144,11 +144,139 @@ module.exports = ({
         })
     }
 
+    const checkMemo = function (req, res, next) {
+        single(req, res, function (err) {
+            if (err) {
+                return res.status(400).json({
+                    message: errorMessage.UNEXPECTED_FIELD_ERROR + ' (img)'
+                })
+            }
+
+            let text = req.body.text
+            let img = req.file
+            let tags = req.body.tags
+            let loc = req.body.loc
+
+            if (check.not.object(img)) {
+                return res.status(400).json({
+                    message: errorMessage.INVALID_POST_REQUEST + ' (img)'
+                })
+            }
+
+            if (check.not.object(loc)) {
+                return res.status(400).json({
+                    message: errorMessage.INVALID_POST_REQUEST + ' (loc)'
+                })
+            }
+
+            if (check.not.string(text)) {
+                return res.status(400).json({
+                    message: errorMessage.INVALID_QUERY_PARAMETER + ' (text)'
+                })
+            }
+
+            let hashtagsWithoutSharp = []
+            if (check.string(tags)) {
+                let hashtags = tags.match(hashtagRegex)
+                try {
+                    hashtags.forEach(hashtag => {
+                        hashtagsWithoutSharp.push(hashtag.substring(1))
+                    })
+                } catch (err) {
+                    return res.status(400).json({
+                        message: errorMessage.INVALID_POST_REQUEST + ' (tags)'
+                    })
+                }
+            }
+            req.body.tags = hashtagsWithoutSharp
+
+            return next()
+        })
+    }
+
+    const checkMemoTextAndImage = function (req, res, next) {
+        single(req, res, function (err) {
+            if (err) {
+                return res.status(400).json({
+                    message: errorMessage.UNEXPECTED_FIELD_ERROR + ' (img)'
+                })
+            }
+
+            let img = req.file
+            let text = req.body.text
+
+            if (check.not.object(img)) {
+                return res.status(400).json({
+                    message: errorMessage.INVALID_POST_REQUEST + ' (img)'
+                })
+            }
+
+            if (check.not.string(text)) {
+                return res.status(400).json({
+                    message: errorMessage.INVALID_QUERY_PARAMETER + ' (text)'
+                })
+            }
+
+            return next()
+        })
+    }
+
+    const checkSkipAndLimit = function (req, res, next) {
+        let skip = req.query.skip
+        let limit = req.query.limit
+
+        if (check.not.string(skip)) {
+            skip = 0
+        }
+
+        if (check.not.string(limit)) {
+            limit = 30
+        }
+
+        return next()
+    }
+
+    const checkLngAndLat = function (req, res, next) {
+        let lng = req.query.lng
+        let lat = req.query.lat
+    
+        if (check.not.string(lng)) {
+          return res.status(400).json({
+            message: errorMessage.INVALID_QUERY_PARAMETER + ' (lng)'
+          })
+        }
+    
+        if (check.not.string(lat)) {
+          return res.status(400).json({
+            message: errorMessage.INVALID_QUERY_PARAMETER + ' (lat)'
+          })
+        }
+
+        return next()
+    }
+
+    const checkTag = function (req, res, next) {
+        let tag = req.query.tag
+
+        if (check.not.string(tag)) {
+          return res.status(400).json({
+            message: errorMessage.INVALID_QUERY_PARAMETER + ' (tag)'
+          })
+        }
+
+        return next()
+    }
+
     return {
         checkEmoji,
         checkRegisterUser,
         checkIdParams,
         checkEmailAndDisplayName,
-        checkProfile
+        checkProfile,
+        checkMemo,
+        checkMemoTextAndImage,
+        checkSkipAndLimit,
+        checkLngAndLat,
+        checkTag
     }
 }

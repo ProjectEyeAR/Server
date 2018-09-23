@@ -50,16 +50,10 @@ module.exports = ({
 		}
 	})
 
-	//HACK!! 이미 추가됐는지 확인해야될까?
 	//@desc : 코멘트 추가
 	//@router : POST http://localhost:3001/api/comments
-	//@body :
-	/* 
-		id: String,
-		emoji: String,
-		memoId: String
-	*/
-	api.post('/', checkLoggedIn, async (req, res) => {
+	//@body : id: String, emoji: String, memoId: String
+	api.post('/', [checkLoggedIn, checkEmoji], async (req, res) => {
 		let myUserId = req.user._id
 		let memoId = req.body.memoId
 		let emoji = req.body.emoji

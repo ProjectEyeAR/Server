@@ -3,23 +3,29 @@ module.exports = ({
   db,
   logger,
   check,
-  errorMessage 
+  errorMessage
 }) => {
   const Memo = require('../model/memo')
   const api = require('express').Router()
   const {
     checkLoggedIn
   } = require('../middleware/authenticate')
-  const upload = require('../services/file-upload')({
+  const {
+    checkMemo,
+    checkMemoTextAndImage,
+    checkIdParams,
+    checkSkipAndLimit,
+    checkLngAndLat,
+    checkTag
+  } = require('../middleware/typeCheck')({
+    logger,
     init
-  });
-  const single = upload.single('img')
-  const hashtagRegex = /#.[^\s\d\t\n\r\.\*\\`~!@#$%^&()\-=+[{\]}|;:'",<>\/?]+/g //ex: #tag1#tag2 => #tag#tag
+  })
 
   //@desc : 주어진 tag가 속한 모든 메모를 출력함
   //@router : GET http://localhost:3001/api/memos/findByTag
   //@query : tag: String,
-  api.get('/findByTag', async (req, res) => {
+  api.get('/findByTag', checkTag, async (req, res) => {
     let tag = req.query.tag
 
     if (check.not.string(tag)) {
@@ -48,14 +54,8 @@ module.exports = ({
   //@desc : 특정 유저에게 속한 모든 메모의 개수를 보여줌
   //@router : GET http://localhost:3001/api/memos/:id/count
   //@params : id: String
-  api.get('/:id/count', async (req, res) => {
+  api.get('/:id/count', checkIdParams, async (req, res) => {
     let id = req.params.id
-
-    if (check.not.string(id)) {
-      return res.status(400).json({
-        message: errorMessage.INVALID_QUERY_PARAMETER + ' (id)'
-      })
-    }
 
     try {
       let count = await Memo.find({})
@@ -100,40 +100,26 @@ module.exports = ({
 
   //@desc : 주어진 좌표에서 가까운 메모 최대 30개 반환, loc img필드만 가져옴
   //@router : GET http://localhost:3001/api/memos/near
-  //@query : 
-  /*	
-    lng: String,
-		lat: String,
-	*/
-  api.get('/near', async (req, res) => {
+  //@query : lng: String, lat: String, skip: String, limit: String
+  api.get('/near', [checkSkipAndLimit, checkLngAndLat], async (req, res) => {
     let lng = req.query.lng
     let lat = req.query.lat
-
-    if (check.not.string(lng)) {
-      return res.status(400).json({
-        message: errorMessage.INVALID_QUERY_PARAMETER + ' (lng)'
-      })
-    }
-
-    if (check.not.string(lat)) {
-      return res.status(400).json({
-        message: errorMessage.INVALID_QUERY_PARAMETER + ' (lat)'
-      })
-    }
+    let skip = req.query.skip
+    let limit = req.query.limit
 
     try {
       let memos = await Memo.find({})
+        .skip(parseInt(skip))
         .where('loc')
         .near({
           center: {
             type: 'Point',
             coordinates: [parseFloat(lng), parseFloat(lat)],
-            spherical: true,
-            maxDistance: 2
-          }
+          },
+          spherical: true
         })
         .select('img loc')
-        .limit(30)
+        .limit(parseInt(limit))
 
       return res.status(200).json({
         data: memos
@@ -150,35 +136,17 @@ module.exports = ({
   //@desc : 특정 유저에 속해있는 모든 메모 출력
   //@router : GET http://localhost:3001/api/memos/:id
   //@params : id: String
-  //@query : 
-  /*	
-  /*skip: String,
-  /*limit: String,
-	*/
-  api.get('/:id', async (req, res) => {
-    let id = req.params.id
+  //@query : skip: String, limit: String
+  api.get('/:id', [checkSkipAndLimit, checkIdParams], async (req, res) => {
+    let tagetUserId = req.params.id
     let skip = req.query.skip
     let limit = req.query.limit
-
-    if (check.not.string(id)) {
-      return res.status(400).json({
-        message: errorMessage.INVALID_QUERY_PARAMETER + ' (id)'
-      })
-    }
-
-    if (check.not.string(skip)) {
-      skip = 0
-    }
-
-    if (check.not.string(limit)) {
-      limit = 30
-    }
 
     try {
       let memos = await Memo.find({})
         .skip(parseInt(skip))
         .where('user')
-        .equals(id)
+        .equals(tagetUserId)
         .sort('date')
         .limit(parseInt(limit))
 
@@ -196,23 +164,11 @@ module.exports = ({
 
   //@desc : 자신에게 속해있는 모든 메모 출력
   //@router : GET http://localhost:3001/api/memos/:id
-  //@query : 
-  /*	
-  /*skip: String,
-  /*limit: String,
-	*/
-  api.get('/', checkLoggedIn, async (req, res) => {
+  //@query : skip: String, limit: String,
+  api.get('/', [checkLoggedIn, checkSkipAndLimit], async (req, res) => {
     let myUserId = req.user._id
     let skip = req.query.skip
     let limit = req.query.limit
-
-    if (check.not.string(skip)) {
-      skip = 0
-    }
-
-    if (check.not.string(limit)) {
-      limit = 30
-    }
 
     try {
       let memos = await Memo.find({})
@@ -241,70 +197,36 @@ module.exports = ({
   /*text: String,
 	/*img: Object,
   /*tags: String,
-  /*loc: Object
+  /*loc: Object [log, lat]
   */
-  api.post('/', checkLoggedIn, (req, res) => {
-    single(req, res, async function (err) {
-      if (err) {
-        return res.status(400).json({
-          message: errorMessage.UNEXPECTED_FIELD_ERROR + ' (img)'
-        })
-      }
+  api.post('/', [checkLoggedIn, checkMemo], async (req, res) => {
+    let text = req.body.text
+    let img = req.file
+    let tags = req.body.tags
+    let loc = req.body.loc
+    let myUserId = req.user._id
 
-      let text = req.body.text
-      let img = req.file
-      let tags = req.body.tags
-      let loc = req.body.loc
-      let myUserId = req.user._id
+    try {
+      let memo = await Memo.create({
+       img: img.location,
+        text: text,
+        loc: loc,
+        tags: tags,
+        user: myUserId
+      })
 
-      if (check.not.object(img)) {
-        return res.status(400).json({
-          message: errorMessage.INVALID_POST_REQUEST + ' (file)'
-        })
-      }
+      return res.status(201).json({
+        data: memo
+      })
 
-      if (check.not.object(loc)) {
-        return res.status(400).json({
-          message: errorMessage.INVALID_POST_REQUEST + ' (loc)'
-        })
-      }
-
-      let hashtagsWithoutSharp = []
-      if (check.string(tags)) {
-        let hashtags = tags.match(hashtagRegex)
-        try {
-          hashtags.forEach(hashtag => {
-            hashtagsWithoutSharp.push(hashtag.substring(1))
-          })
-        } catch (err) {
-          return res.status(400).json({
-            message: errorMessage.INVALID_POST_REQUEST + ' (tags)'
-          })
-        }
-      }
-
-      try {
-        let memo = await Memo.create({
-          img: img.location,
-          text: text,
-          loc: loc,
-          tags: hashtagsWithoutSharp,
-          user: myUserId
-        })
-
-        return res.status(201).json({
-          data: memo
-        })
-
-      } catch (err) {
-        logger.error(err.message)
-        return res.status(500).json({
-          message: err.message
-        })
-      }
-
-    })
+    } catch (err) {
+      logger.error(err.message)
+      return res.status(500).json({
+        message: err.message
+      })
+    }
   })
+
 
   //@desc : 자신의 모든 메모를 삭제함
   //@router : DELETE http://localhost:3001/api/memos
@@ -329,26 +251,18 @@ module.exports = ({
   //@desc : 자신의 특정한 메모 한 개를 삭제함
   //@router : DELETE http://localhost:3001/api/memos/:id
   //@params : id: String
-  api.delete('/:id', checkLoggedIn, async (req, res) => {
+  api.delete('/:id', [checkLoggedIn, checkIdParams], async (req, res) => {
     let id = req.params.id
-    let myUserId = req.user._id
-
-    if (check.not.string(id)) {
-      return res.status(400).json({
-        message: errorMessage.INVALID_QUERY_PARAMETER + ' (id)'
-      })
-    }
 
     let filter = {
-      memo: id,
-      user: myUserId
+      _id: id
     }
 
     try {
       await Memo.findOneAndDelete(filter)
 
       return res.status(200).json({})
-
+      
     } catch (err) {
       logger.error(err.message)
       return res.status(500).json({
@@ -357,97 +271,29 @@ module.exports = ({
     }
   })
 
-  //@desc : 자신의 특정한 memo의 사진을 바꿈
-  //@router : PUT http://localhost:3001/api/memos/:id/image
+  //@desc : 자신의 특정한 memo의 사진, 텍스트를 바꿈
+  //@router : PUT http://localhost:3001/api/memos/:id/TextAndImage
   //@params : id: String
-  //@body: img: Object
-  api.put('/:id/image', checkLoggedIn, (req, res) => {
-    single(req, res, async function (err) {
-      if (err) {
-        return res.status(400).json({
-          message: errorMessage.UNEXPECTED_FIELD_ERROR + ' (img)'
-        })
-      }
-
-      let id = req.params.id
-      let myUserId = req.user._id
-      let img = req.file
-
-      if (check.not.object(img)) {
-        return res.status(400).json({
-          message: errorMessage.INVALID_POST_REQUEST + ' (img)'
-        })
-      }
-
-      if (check.not.string(id)) {
-        return res.status(400).json({
-          message: errorMessage.INVALID_QUERY_PARAMETER + ' (id)'
-        })
-      }
-
-      let filter = {
-        memo: id,
-        user: myUserId
-      }
-      let update = {
-        $set: {
-          img: img.location,
-        }
-      }
-      let option = {
-        new: true,
-        upsert: false //업데이트된 데이터가 출력됨, 없으면 생성하지 않음
-      }
-
-      try {
-        let memo = await Memo.findOneAndUpdate(filter, update, option)
-
-        return res.status(200).json({
-          data: memo
-        })
-
-      } catch (err) {
-        logger.error(err.message)
-        return res.status(500).json({
-          message: err.message
-        })
-      }
-    })
-  })
-
-  //@desc : 자신의 특정한 memo의 text를 바꿈
-  //@router : PUT http://localhost:3001/api/memos/:id/text
-  //@params : id: String 
-  //@body : img: Object
-  api.put('/:id/text', checkLoggedIn, async (req, res) => {
+  //@body: img: Object, text: String
+  api.put('/:id/TextAndImage', [checkLoggedIn, checkMemoTextAndImage, checkIdParams], async (req, res) => {
     let id = req.params.id
     let myUserId = req.user._id
+    let img = req.file
     let text = req.body.text
 
-    if (check.not.string(id)) {
-      return res.status(400).json({
-        message: errorMessage.INVALID_QUERY_PARAMETER + ' (id)'
-      })
-    }
-
-    if (check.not.string(text)) {
-      return res.status(400).json({
-        message: errorMessage.INVALID_QUERY_PARAMETER + ' (text)'
-      })
-    }
-
     let filter = {
-      memo: id,
+      _id: id,
       user: myUserId
     }
     let update = {
       $set: {
-        text: text,
+        img: img.location,
+        text: text
       }
     }
     let option = {
       new: true,
-      upsert: false //업데이트된 데이터가 출력됨, 없으면 생성하지 않음
+      upsert: false
     }
 
     try {
