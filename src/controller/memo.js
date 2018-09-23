@@ -1,9 +1,7 @@
 module.exports = ({
   init,
   db,
-  logger,
-  check,
-  errorMessage
+  logger
 }) => {
   const Memo = require('../model/memo')
   const api = require('express').Router()
@@ -27,12 +25,6 @@ module.exports = ({
   //@query : tag: String,
   api.get('/findByTag', checkTag, async (req, res) => {
     let tag = req.query.tag
-
-    if (check.not.string(tag)) {
-      return res.status(400).json({
-        message: errorMessage.INVALID_QUERY_PARAMETER + ' (tag)'
-      })
-    }
 
     try {
       let memos = await Memo.find({

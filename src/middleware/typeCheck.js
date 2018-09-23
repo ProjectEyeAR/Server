@@ -10,18 +10,19 @@ module.exports = ({
     const errorMessage = require('../error_message')
     const check = require('check-types')
     const User = require('../model/user')
+    const Comment = require('../model/comment')
     const EMAIL_REGEX = /^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])$/
     const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/
     const DISPLAY_NAME_REGEX = /^[^\s\t\n\r\`\~\!\@\#\$\%\^\&\*\(\)\+\=\[\]\\\{\}\|\;\'\:\"\,\.\/\<\>\?]+$/
     const hashtagRegex = /#.[^\s\d\t\n\r\.\*\\`~!@#$%^&()\-=+[{\]}|;:'",<>\/?]+/g //ex: #tag1#tag2 => #tag#tag HACK!! 1글자 안됨 ex) #a#b#c
 
-    const checkEmoji = function (req, res, next) {
+    const checkEmojiAndMemo = function (req, res, next) {
         let emoji = req.body.emoji
-        let memoId = req.body.memoId
+        let memo = req.body.memo
 
-        if (check.not.string(memoId)) {
+        if (check.not.string(memo)) {
             return res.status(404).json({
-                message: errorMessage.INVALID_POST_REQUEST + ' (memoId)'
+                message: errorMessage.INVALID_POST_REQUEST + ' (memo)'
             })
         }
 
@@ -30,6 +31,48 @@ module.exports = ({
                 message: errorMessage.INVALID_POST_REQUEST + ' (emoji)'
             })
         }
+
+        return next()
+    }
+
+    const checkEmoji = function (req, res, next) {
+        let emoji = req.body.emoji
+
+        if (check.not.string(emoji)) {
+            return res.status(404).json({
+                message: errorMessage.INVALID_POST_REQUEST + ' (emoji)'
+            })
+        }
+
+
+        return next()
+    }
+
+
+    const checkDuplicatedMemoAndUserid = async function (req, res, next) {
+        let myUserId = req.user._id
+        let memo = req.body.memo
+
+        try {
+            //이미 작성한 코멘트가 있는지 확인
+            const emojiQuery = {
+                user: myUserId,
+                memo: memo
+            }
+            let emojiCount = await Comment.count(emojiQuery)
+
+            if (emojiCount > 0) {
+                return res.status(409).json({
+                    message: errorMessage.CONFLICT_PARAMETER + ' (user, memo)'
+                })
+            }
+        } catch (err) {
+            logger.error(err.message)
+            res.status(500).json({
+                message: err.message
+            })
+        }
+
         return next()
     }
 
@@ -86,7 +129,7 @@ module.exports = ({
         return next()
     }
 
-    const checkEmailAndDisplayName = async function (req, res, next) {
+    const checkDuplicatedEmailAndDisplayName = async function (req, res, next) {
         let email = req.body.email
         let displayName = req.body.displayName
 
@@ -239,17 +282,17 @@ module.exports = ({
     const checkLngAndLat = function (req, res, next) {
         let lng = req.query.lng
         let lat = req.query.lat
-    
+
         if (check.not.string(lng)) {
-          return res.status(400).json({
-            message: errorMessage.INVALID_QUERY_PARAMETER + ' (lng)'
-          })
+            return res.status(400).json({
+                message: errorMessage.INVALID_QUERY_PARAMETER + ' (lng)'
+            })
         }
-    
+
         if (check.not.string(lat)) {
-          return res.status(400).json({
-            message: errorMessage.INVALID_QUERY_PARAMETER + ' (lat)'
-          })
+            return res.status(400).json({
+                message: errorMessage.INVALID_QUERY_PARAMETER + ' (lat)'
+            })
         }
 
         return next()
@@ -259,19 +302,21 @@ module.exports = ({
         let tag = req.query.tag
 
         if (check.not.string(tag)) {
-          return res.status(400).json({
-            message: errorMessage.INVALID_QUERY_PARAMETER + ' (tag)'
-          })
+            return res.status(400).json({
+                message: errorMessage.INVALID_QUERY_PARAMETER + ' (tag)'
+            })
         }
 
         return next()
     }
 
     return {
+        checkEmojiAndMemo,
         checkEmoji,
+        checkDuplicatedMemoAndUserid,
         checkRegisterUser,
         checkIdParams,
-        checkEmailAndDisplayName,
+        checkDuplicatedEmailAndDisplayName,
         checkProfile,
         checkMemo,
         checkMemoTextAndImage,

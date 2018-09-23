@@ -1,9 +1,7 @@
 module.exports = ({
 	init,
 	db,
-	logger,
-	check,
-	errorMessage
+	logger
 }) => {
 	const {
 		checkLoggedIn
@@ -14,7 +12,7 @@ module.exports = ({
 	const {
 		checkRegisterUser,
 		checkIdParams,
-		checkEmailAndDisplayName,
+		checkDuplicatedEmailAndDisplayName,
 		checkProfile
 	} = require('../middleware/typeCheck')({
 		logger,
@@ -24,14 +22,8 @@ module.exports = ({
 
 	//@desc : 로컬 회원가입
 	//@router: DELETE http://localhost:3001/api/users
-	//@body : 
-	/*
-	/*email: String, 
-	/*password: String, 
-	/*displayName: String, 
-	/*img: Object
-	*/
-	api.post('/', [checkRegisterUser, checkEmailAndDisplayName], async (req, res) => {
+	//@body : email: String, password: String, displayName: String, img: Object
+	api.post('/', [checkRegisterUser, checkDuplicatedEmailAndDisplayName], async (req, res) => {
 		let email = req.body.email
 		let password = req.body.password
 		let displayName = req.body.displayName
@@ -123,14 +115,8 @@ module.exports = ({
 
 	//@desc : 자신의 계정을 수정
 	//@router : PUT http://localhost:3001/api/users
-	//@body : 
-	/*
-	/*email: String, 
-	/*password: String, 
-	/*displayName: String, 
-	/*img: Object
-	*/
-	api.put('/', [checkLoggedIn, checkRegisterUser, checkEmailAndDisplayName], (req, res) => {
+	//@body : email: String, password: String, displayName: String, img: Object
+	api.put('/', [checkLoggedIn, checkRegisterUser, checkDuplicatedEmailAndDisplayName], (req, res) => {
 		let myUserId = req.user._id
 		let img = req.file
 		let email = req.body.email
