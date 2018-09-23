@@ -40,6 +40,7 @@ module.exports = ({
   })
 
   //@desc : 페이스북 로그인
+  //@router : GET http://localhost:3001/api/auth/facebook
   api.get('/facebook', passport.authenticate('facebook', {
     scope: 'email'
   }))

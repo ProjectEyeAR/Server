@@ -124,7 +124,7 @@ module.exports = ({
 		}
 		let option = {
 			new: true,
-			upsert: false 
+			upsert: false
 		}
 
 		try {

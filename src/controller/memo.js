@@ -22,7 +22,7 @@ module.exports = ({
 
   //@desc : 주어진 tag가 속한 모든 메모를 출력함
   //@router : GET http://localhost:3001/api/memos/findByTag
-  //@query : tag: String,
+  //@query : tag: String
   api.get('/findByTag', checkTag, async (req, res) => {
     let tag = req.query.tag
 
@@ -156,7 +156,7 @@ module.exports = ({
 
   //@desc : 자신에게 속해있는 모든 메모 출력
   //@router : GET http://localhost:3001/api/memos/:id
-  //@query : skip: String, limit: String,
+  //@query : skip: String, limit: String
   api.get('/', [checkLoggedIn, checkSkipAndLimit], async (req, res) => {
     let myUserId = req.user._id
     let skip = req.query.skip
@@ -184,13 +184,7 @@ module.exports = ({
 
   //@desc : 자신에게 메모를 추가함
   //@router : POST http://localhost:3001/api/memos
-  //@body : 	
-  /*
-  /*text: String,
-	/*img: Object,
-  /*tags: String,
-  /*loc: Object [log, lat]
-  */
+  //@body : text: String, img: Object, tags: String, loc: Object [log, lat]
   api.post('/', [checkLoggedIn, checkMemo], async (req, res) => {
     let text = req.body.text
     let img = req.file
