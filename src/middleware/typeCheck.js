@@ -197,7 +197,6 @@ module.exports = ({
 
             let text = req.body.text
             let img = req.file
-            let tags = req.body.tags
             let loc = req.body.loc
 
             if (check.not.object(img)) {
@@ -219,8 +218,7 @@ module.exports = ({
             }
 
             let hashtagsWithoutSharp = []
-            if (check.string(tags)) {
-                let hashtags = tags.match(hashtagRegex)
+            let hashtags = text.match(hashtagRegex)
                 try {
                     hashtags.forEach(hashtag => {
                         hashtagsWithoutSharp.push(hashtag.substring(1))
@@ -230,7 +228,6 @@ module.exports = ({
                         message: errorMessage.INVALID_POST_REQUEST + ' (tags)'
                     })
                 }
-            }
             req.body.tags = hashtagsWithoutSharp
 
             return next()
