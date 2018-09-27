@@ -9,5 +9,6 @@ module.exports = {
   "AWS_SECRET_ACCESS_KEY": process.env.AWS_SECRET_ACCESS_KEY,
   "HerokuUrl": "https://whispering-sea-68497.herokuapp.com",
   "clientID": process.env.clientID,
-  "clientSecret": process.env.clientSecret
+  "clientSecret": process.env.clientSecret,
+  "email": process.env.email
 } 

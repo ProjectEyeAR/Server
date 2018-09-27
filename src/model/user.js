@@ -12,7 +12,7 @@ const userSchema = new Schema({
   password: {
     type: String
   },
-  authId: {
+  type: {
     type: String
   },
   salt: {

@@ -19,6 +19,7 @@ module.exports = ({
     logger,
     init
   })
+  const axios = require('axios')
 
   //@desc : 주어진 tag가 속한 모든 메모를 출력함
   //@router : GET http://localhost:3001/api/memos/findByTag
@@ -90,7 +91,7 @@ module.exports = ({
     }
   })
 
-  //@desc : 주어진 좌표에서 가까운 메모 최대 30개 반환, loc img필드만 가져옴
+  //@desc : 주어진 좌표에서 가까운 메모 최대 30개 반환, loc img address필드만 가져옴
   //@router : GET http://localhost:3001/api/memos/near
   //@query : lng: String, lat: String, skip: String, limit: String
   api.get('/near', [checkSkipAndLimit, checkLngAndLat], async (req, res) => {
@@ -110,7 +111,7 @@ module.exports = ({
           },
           spherical: true
         })
-        .select('img loc')
+        .select('img loc address')
         .limit(parseInt(limit))
 
       return res.status(200).json({
@@ -184,21 +185,34 @@ module.exports = ({
 
   //@desc : 자신에게 메모를 추가함
   //@router : POST http://localhost:3001/api/memos
-  //@body : text: String, img: Object, tags: String, loc: Object [log, lat]
+  //@body : text: String, img: Object, tags: String, loc: Object [lng, lat]
   api.post('/', [checkLoggedIn, checkMemo], async (req, res) => {
     let text = req.body.text
     let img = req.file
-    let tags = req.body.tags
     let loc = req.body.loc
     let myUserId = req.user._id
+    let tags = req.body.tags
+    let address
+
+    await axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${loc.coordinates[1]}&lon=${loc.coordinates[0]}&email=${init.email}`)
+      .then(res => {
+        address = res.data.address
+      })
+      .catch(err => {
+        logger.error(err.message)
+        return res.status(500).json({
+          message: err.message
+        })
+      })
 
     try {
       let memo = await Memo.create({
-       img: img.location,
+        img: img.location,
         text: text,
         loc: loc,
         tags: tags,
-        user: myUserId
+        user: myUserId,
+        address: address
       })
 
       return res.status(201).json({
@@ -248,7 +262,7 @@ module.exports = ({
       await Memo.findOneAndDelete(filter)
 
       return res.status(200).json({})
-      
+
     } catch (err) {
       logger.error(err.message)
       return res.status(500).json({
@@ -265,7 +279,7 @@ module.exports = ({
     let id = req.params.id
     let myUserId = req.user._id
     let img = req.file
-    let text = req.body.text
+    let tags = req.body.tags
 
     let filter = {
       _id: id,
@@ -274,7 +288,7 @@ module.exports = ({
     let update = {
       $set: {
         img: img.location,
-        text: text
+        tags: tags
       }
     }
     let option = {

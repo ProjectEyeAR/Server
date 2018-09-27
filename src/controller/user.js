@@ -40,7 +40,7 @@ module.exports = ({
 			}
 
 			let newUser = new User({
-				authId: 'local:' + email,
+				type: 'local',
 				email: email,
 				password: hash,
 				profile: img.location,
@@ -113,7 +113,7 @@ module.exports = ({
 		}
 	})
 
-	//@desc : 자신의 계정을 수정
+	//@desc : 자신의 로컬 계정을 수정
 	//@router : PUT http://localhost:3001/api/users
 	//@body : email: String, password: String, displayName: String, img: Object
 	api.put('/', [checkLoggedIn, checkRegisterUser, checkDuplicatedEmailAndDisplayName], (req, res) => {
@@ -138,7 +138,6 @@ module.exports = ({
 			}
 			let update = {
 				$set: {
-					authId: 'local:' + email,
 					email: email,
 					password: hash,
 					salt: salt,

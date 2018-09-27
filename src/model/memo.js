@@ -35,7 +35,10 @@ const memoSchema = new Schema({
     required: true,
 
   },
-  loc: geoSchema
+  loc: geoSchema,
+  address: {
+    type: Object
+  }
 });
 
 memoSchema.index({

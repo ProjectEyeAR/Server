@@ -14,7 +14,7 @@ module.exports = ({
     const EMAIL_REGEX = /^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])$/
     const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/
     const DISPLAY_NAME_REGEX = /^[^\s\t\n\r\`\~\!\@\#\$\%\^\&\*\(\)\+\=\[\]\\\{\}\|\;\'\:\"\,\.\/\<\>\?]+$/
-    const hashtagRegex = /#.[^\s\d\t\n\r\.\*\\`~!@#$%^&()\-=+[{\]}|;:'",<>\/?]+/g //ex: #tag1#tag2 => #tag#tag HACK!! 1글자 안됨 ex) #a#b#c
+    const HASHTAG_REGEX = /#.[^\s\d\t\n\r\.\*\\`~!@#$%^&()\-=+[{\]}|;:'",<>\/?]+/g //ex: #tag1#tag2 => #tag#tag HACK!! 1글자 안됨 ex) #a#b#c
 
     const checkEmojiAndMemo = function (req, res, next) {
         let emoji = req.body.emoji
@@ -187,6 +187,23 @@ module.exports = ({
         })
     }
 
+    const filterTags = function (req, res, text) {
+        let hashtagsWithoutSharp = []
+        let hashtags = text.match(HASHTAG_REGEX)
+
+        if (check.null(hashtags)) {
+            return res.status(400).json({
+                message: errorMessage.INVALID_POST_REQUEST + ' (text)'
+            })
+        }
+
+        hashtags.forEach(hashtag => {
+            hashtagsWithoutSharp.push(hashtag.substring(1))
+        })
+
+        return hashtagsWithoutSharp
+    }
+
     const checkMemo = function (req, res, next) {
         single(req, res, function (err) {
             if (err) {
@@ -199,11 +216,11 @@ module.exports = ({
             let img = req.file
             let loc = req.body.loc
 
-            if (check.not.object(img)) {
-                return res.status(400).json({
-                    message: errorMessage.INVALID_POST_REQUEST + ' (img)'
-                })
-            }
+            // if (check.not.object(img)) {
+            //     return res.status(400).json({
+            //         message: errorMessage.INVALID_POST_REQUEST + ' (img)'
+            //     })
+            // }
 
             if (check.not.object(loc)) {
                 return res.status(400).json({
@@ -217,18 +234,7 @@ module.exports = ({
                 })
             }
 
-            let hashtagsWithoutSharp = []
-            let hashtags = text.match(hashtagRegex)
-                try {
-                    hashtags.forEach(hashtag => {
-                        hashtagsWithoutSharp.push(hashtag.substring(1))
-                    })
-                } catch (err) {
-                    return res.status(400).json({
-                        message: errorMessage.INVALID_POST_REQUEST + ' (tags)'
-                    })
-                }
-            req.body.tags = hashtagsWithoutSharp
+            req.body.tags = filterTags(req, res, text)
 
             return next()
         })
@@ -256,6 +262,8 @@ module.exports = ({
                     message: errorMessage.INVALID_QUERY_PARAMETER + ' (text)'
                 })
             }
+
+            req.body.tags = filterTags(req, res, text)
 
             return next()
         })

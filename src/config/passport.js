@@ -30,7 +30,7 @@ module.exports = ({
   }, function (req, userEmail, password, done) {
 
     let filter = {
-      authId: 'local:' + userEmail
+      email: userEmail
     }
 
     try {
@@ -64,18 +64,19 @@ module.exports = ({
     clientID: init.clientID,
     clientSecret: init.clientSecret,
     callbackURL: "/api/auth/facebook/callback",
-    profileFields: ['id', 'name', 'email', 'displayName']
+    profileFields: ['id', 'name', 'email', 'displayName', 'photos']
   }, async function (accessToken, refreshToken, profile, done) {
-    let authId = 'facebook:' + profile.id
+    let type = 'facebook'
 
     let filter = {
-      authId: authId
+      email: email
     }
     let update = {
       $set: {
-        authId: authId,
+        type: type,
         email: profile.emails[0].value,
-        displayName: profile.displayName
+        displayName: profile.displayName,
+        profile: profile.photos ? profile.photos[0].value : ''
       }
     }
     let option = {
