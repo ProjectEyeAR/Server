@@ -24,7 +24,7 @@ app.use(flash());
 app.disable('x-powered-by')
 app.use(helmet())
 app.use(express.static('public'))
-app.use(bodyParser.urlencoded({extended: false}))
+app.use(bodyParser.urlencoded({extended: false, limit: '100mb'}))
 app.use(bodyParser.json())
 
 app.use('/api', routes)
