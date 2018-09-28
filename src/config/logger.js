@@ -3,7 +3,7 @@ module.exports = (init) => {
   const winston = require('winston')
   require('winston-mongodb')
   const logger = winston.createLogger({
-    level: 'info',
+    level: 'debug',
     format: winston.format.json(),
     transports: [
       new winston.transports.MongoDB({
