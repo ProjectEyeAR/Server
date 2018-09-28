@@ -221,7 +221,7 @@ module.exports = ({
                     message: errorMessage.INVALID_POST_REQUEST + ' (img)'
                 })
             }
-
+            
             if (check.not.object(loc)) {
                 return res.status(400).json({
                     message: errorMessage.INVALID_POST_REQUEST + ' (loc)'
