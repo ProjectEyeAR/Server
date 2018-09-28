@@ -37,9 +37,9 @@ module.exports = ({
             key: function (req, file, cb) {
                 cb(null, Date.now().toString() + path.extname(file.originalname))
             },
-            limits: {
-                fileSize: 1024 * 1024 * 10  //10MB
-            }
+            // limits: {
+            //     fileSize: 1024 * 1024 * 10  //10MB
+            // }
         })
     })
 
