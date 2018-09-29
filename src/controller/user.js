@@ -118,9 +118,8 @@ module.exports = ({
 		}
 		*/
 
-		let user = await User.find({})
-				.where('_id')
-				.equals(id)
+		let query = { '_id': id }
+		let user = await User.findOne(query)
 			
 			let followingQuery = { user: id }
     		let followingCount = await Following.count(followingQuery)
