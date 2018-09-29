@@ -10,6 +10,8 @@ module.exports = ({
   const {
     checkLoggedIn
   } = require('../middleware/authenticate')
+  const Following = require('../model/following')
+  const Comment = require('../model/comment')
 
   //@desc : login 실패시 failureRedircet에 의해 작동되는 라우터
   api.get('/session/fail', (req, res) => {
@@ -27,8 +29,23 @@ module.exports = ({
     failureRedirect: '/api/auth/session/fail',
     failureFlash: true
   }), (req, res) => {
+    let user = req.user
+
+    let followingQuery = { user: id }
+    let followingCount = await Following.count(followingQuery)
+
+    let followerQuery = { followUser: id }
+    let followerCount = await Following.count(followQuery)
+
+    let commentCountQuery = { user: id }
+    let commentCount = await Comment.count(countQuery)
+
+    user.followingCount = followingCount 
+    user.followerCount = followerCount
+    user.commentCount = commentCount
+
     res.status(200).json({
-      data: req.user
+      data: user
     })
   })
 
