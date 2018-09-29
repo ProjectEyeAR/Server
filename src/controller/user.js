@@ -70,6 +70,7 @@ module.exports = ({
 		let userId = req.query.userId
 
 		try {
+			/*
 			let followingQuery = {user: userId}
 			let followingCount = await Following.count(followingQuery)
 
@@ -82,12 +83,7 @@ module.exports = ({
 			user.set('followingCount', followingCount)
     		user.set('followerCount', followerCount)
     		user.set('commentCount', commentCount)
-
-			if (count > 0) {
-				return res.status(409).json({
-					message: errorMessage.CONFLICT_COMMENT
-				})
-			}
+    		*/
 
 			return res.status(200).json({
 				data: user
@@ -116,6 +112,7 @@ module.exports = ({
 				.where('_id')
 				.equals(id)
 
+			/*
 			let followingQuery = {user: id}
 			let followingCount = await Following.count(followingQuery)
 
@@ -135,6 +132,7 @@ module.exports = ({
 				let count = await Following.count(query)
 				user.following = count > 0
 			}
+			*/
 
 			return res.status(200).json({
 				data: user
