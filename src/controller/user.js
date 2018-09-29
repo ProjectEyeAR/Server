@@ -103,7 +103,7 @@ module.exports = ({
 	//@desc : 특정 유저 정보 가져오기
 	//@router : GET http://localhost:3001/api/users/:id
 	//@params : id: String
-	api.get('/:id', checkIdParams, async (req, res) => {
+	api.get('/:id', [checkLoggedIn, checkIdParams], async (req, res) => {
 		let id = req.params.id
 
 		try {
@@ -120,17 +120,14 @@ module.exports = ({
 			let commentCountQuery = { user: id }
 			let commentCount = await Comment.count(commentCountQuery)
 
+			let userId = req.user._id
+			let query = { user: userId, followUser: id }
+			let count = await Following.count(query)
+
 			user.set('followingCount', followingCount)
     		user.set('followerCount', followerCount)
     		user.set('commentCount', commentCount)
-
-			if (req.isAuthenticated()) {
-				let userId = req.user._id
-				let query = { user: userId, followUser: id }
-				let count = await Following.count(query)
-
-				user.set('following', count > 0 ? true : false)
-			}
+			user.set('following', count > 0 ? true : false)
 
 			return res.status(200).json({
 				data: user
