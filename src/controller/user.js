@@ -65,6 +65,29 @@ module.exports = ({
 	//@desc : 자신의 유저 정보 가져오기
 	//@router : GET http://localhost:3001/api/users/me
 	api.get('/me', checkLoggedIn, (req, res) => {
+		let userId = req.query.userId
+
+		try {
+			let followingQuery = {user: userId}
+			let followingCount = await Following.count(followingQuery)
+
+			let followerQuery = {followUser: userId}
+			let followerCount = await Following.count(followQuery)
+
+			user.followingCount = followingCount 
+			user.followerCount = followerCount
+
+			return res.status(200).json({
+				data: user
+			})
+
+		} catch (err) {
+			logger.error(err.message)
+			return res.status(500).json({
+				message: err.message
+			})
+		}
+
 		res.status(401).json({
 			data: req.user
 		})
@@ -80,6 +103,22 @@ module.exports = ({
 			let user = await User.find({})
 				.where('_id')
 				.equals(id)
+
+			let followingQuery = {user: id}
+			let followingCount = await Following.count(followingQuery)
+
+			let followerQuery = {followUser: id}
+			let followerCount = await Following.count(followQuery)
+
+			user.followingCount = followingCount 
+			user.followerCount = followerCount
+
+			if (req.isAuthenticated()) {
+				let userId = req.query.userId
+				let query = {user: userId, followUser: id}
+				let count = await Following.count(query)
+				user.following = count > 0
+			}
 
 			return res.status(200).json({
 				data: user
