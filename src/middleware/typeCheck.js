@@ -129,6 +129,18 @@ module.exports = ({
         return next()
     }
 
+    const checkUserIdQuery = function (req, res, next) {
+        let userId = req.query.userId
+
+        if (check.not.string(userId)) {
+            return res.status(400).json({
+                message: errorMessage.INVALID_QUERY_PARAMETER + ' (userId)'
+            })
+        }
+
+        return next()
+    }
+
     const checkDuplicatedEmailAndDisplayName = async function (req, res, next) {
         let email = req.body.email
         let displayName = req.body.displayName
@@ -317,6 +329,7 @@ module.exports = ({
         checkDuplicatedMemoAndUserid,
         checkRegisterUser,
         checkIdParams,
+        checkUserIdQuery,
         checkDuplicatedEmailAndDisplayName,
         checkProfile,
         checkMemo,

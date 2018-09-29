@@ -12,6 +12,7 @@ module.exports = ({
     checkMemo,
     checkMemoTextAndImage,
     checkIdParams,
+    checkUserIdQuery,
     checkSkipAndLimit,
     checkLngAndLat,
     checkTag
@@ -130,8 +131,8 @@ module.exports = ({
   //@router : GET http://localhost:3001/api/memos/:id
   //@params : id: String
   //@query : skip: String, limit: String
-  api.get('/:id', [checkSkipAndLimit, checkIdParams], async (req, res) => {
-    let tagetUserId = req.params.id
+  api.get('/', [checkSkipAndLimit, checkUserIdQuery], async (req, res) => {
+    let tagetUserId = req.query.userId
     let skip = req.query.skip
     let limit = req.query.limit
 
@@ -140,34 +141,6 @@ module.exports = ({
         .skip(parseInt(skip))
         .where('user')
         .equals(tagetUserId)
-        .sort('date')
-        .limit(parseInt(limit))
-
-      return res.status(200).json({
-        data: memos
-      })
-
-    } catch (err) {
-      logger.error(err.message)
-      return res.status(500).json({
-        message: err.message
-      })
-    }
-  })
-
-  //@desc : 자신에게 속해있는 모든 메모 출력
-  //@router : GET http://localhost:3001/api/memos/:id
-  //@query : skip: String, limit: String
-  api.get('/', [checkLoggedIn, checkSkipAndLimit], async (req, res) => {
-    let myUserId = req.user._id
-    let skip = req.query.skip
-    let limit = req.query.limit
-
-    try {
-      let memos = await Memo.find({})
-        .skip(parseInt(skip))
-        .where('user')
-        .equals(myUserId)
         .sort('date')
         .limit(parseInt(limit))
 
