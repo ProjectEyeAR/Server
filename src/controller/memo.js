@@ -40,7 +40,7 @@ module.exports = ({
         let commentQuery = { user: userId, memo: id }
         let count = await Comment.count(commentQuery)
 
-        memo.set('comment', count > 0)
+        memo.set('haveComment', count > 0)
       }
 
       return res.status(200).json({
