@@ -26,8 +26,19 @@ module.exports = ({
   api.get('/:id', checkIdParams, async (req, res) => {
     let id = req.params.id
 
+    /*
     try {
-      let query = { '_id': id }
+      
+
+    } catch (err) {
+      logger.error(err.message)
+      return res.status(500).json({
+        message: err.message
+      })
+    }
+    */
+
+    let query = { '_id': id }
       let memo = await Memo.findOne(query).populate('user')
 
       let commentCountQuery = { memo: id }
@@ -46,13 +57,6 @@ module.exports = ({
       return res.status(200).json({
         data: memo
       })
-
-    } catch (err) {
-      logger.error(err.message)
-      return res.status(500).json({
-        message: err.message
-      })
-    }
   })
 
   //@desc : 주어진 tag가 속한 모든 메모를 출력함
