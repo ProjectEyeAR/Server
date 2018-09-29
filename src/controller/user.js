@@ -123,7 +123,7 @@ module.exports = ({
     		user.set('followerCount', followerCount)
     		user.set('commentCount', commentCount)
 
-			if (req.isAuthenticated) {
+			if (req.isAuthenticated()) {
 				let userId = req.user._id
 				let followingQuery = { user: userId, followUser: id }
 				let count = await Following.count(followingQuery)
