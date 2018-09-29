@@ -28,6 +28,6 @@ const userSchema = new Schema({
   phoneNumber: {
     type: String
   }
-})
+}, { strict: false })
 
 module.exports = mongoose.model('User', userSchema)
