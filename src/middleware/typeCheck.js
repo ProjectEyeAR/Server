@@ -16,6 +16,12 @@ module.exports = ({
     const DISPLAY_NAME_REGEX = /^[^\s\t\n\r\`\~\!\@\#\$\%\^\&\*\(\)\+\=\[\]\\\{\}\|\;\'\:\"\,\.\/\<\>\?]+$/
     const HASHTAG_REGEX = /#.[^\s\d\t\n\r\.\*\\`~!@#$%^&()\-=+[{\]}|;:'",<>\/?]+/g //ex: #tag1#tag2 => #tag#tag HACK!! 1글자 안됨 ex) #a#b#c
 
+    const fs = require('fs'),
+    gm = require('gm').subClass({
+      imageMagick: true
+    })
+  const request = require('request')
+
     const checkEmojiAndMemo = function (req, res, next) {
         let emoji = req.body.emoji
         let memo = req.body.memo
@@ -201,6 +207,15 @@ module.exports = ({
     }
 
     const checkMemo = function (req, res, next) {
+        let chunks = []
+        const stream2 = gm(request('https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png'))
+          .thumbnail('50', '50', '!')
+          .stream(function (err, stdout, stderr) {
+            var writeStream = fs.createWriteStream('/temp/resized.jpg');
+            stdout.pipe(writeStream);
+          });
+
+
         single(req, res, function (err) {
             if (err) {
                 return res.status(400).json({

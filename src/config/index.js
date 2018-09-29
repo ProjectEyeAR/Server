@@ -1,7 +1,7 @@
 require('dotenv').config()
 
 module.exports = {
-  "port": process.env.PORT||3001,
+  "port": process.env.PORT||3002,
   //"mongoUrl": "mongodb://localhost/seoul_app_contest",
   "mongoUrl" : process.env.mongoUrl,
   "SESSION_SECRET_KEY": process.env.SESSION_SECRET_KEY,

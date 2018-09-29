@@ -20,6 +20,11 @@ module.exports = ({
     init
   })
   const axios = require('axios')
+  // const fs = require('fs'),
+  //   gm = require('gm').subClass({
+  //     imageMagick: true
+  //   })
+  // const request = require('request')
 
   //@desc : 주어진 tag가 속한 모든 메모를 출력함
   //@router : GET http://localhost:3001/api/memos/findByTag
@@ -113,6 +118,21 @@ module.exports = ({
         })
         .select('img loc address')
         .limit(parseInt(limit))
+
+      // let chunks = []
+      // const stream2 = gm(request('https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png'))
+      //   .thumbnail('50', '50', '!')
+      //   .stream()
+
+      // stream2.on('data', function (chunk) {
+      //   chunks.push(chunk)
+      // })
+
+      // stream2.on('end', function () {
+      //   var result = Buffer.concat(chunks);
+      //   console.log('final result:', result.toString('base64'));
+      // })
+
 
       return res.status(200).json({
         data: memos
