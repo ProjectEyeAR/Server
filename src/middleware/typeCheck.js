@@ -191,15 +191,11 @@ module.exports = ({
         let hashtagsWithoutSharp = []
         let hashtags = text.match(HASHTAG_REGEX)
 
-        if (check.null(hashtags)) {
-            return res.status(400).json({
-                message: errorMessage.INVALID_POST_REQUEST + ' (text)'
+        if (!check.null(hashtags)) {
+            hashtags.forEach(hashtag => {
+                hashtagsWithoutSharp.push(hashtag.substring(1))
             })
         }
-
-        hashtags.forEach(hashtag => {
-            hashtagsWithoutSharp.push(hashtag.substring(1))
-        })
 
         return hashtagsWithoutSharp
     }
