@@ -61,6 +61,15 @@ module.exports = ({
 		let emoji = req.body.emoji
 
 		try {
+			let countQuery = { user: myUserId, memo: memo }
+			let count = await Comment.count(countQuery)
+
+			if (count > 0) {
+				return res.status(409).json({
+					message: errorMessage.CONFLICT_COMMENT
+				})
+			}
+
 			let query = {
 				user: myUserId,
 				memo: memo,

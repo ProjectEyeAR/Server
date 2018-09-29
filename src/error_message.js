@@ -7,3 +7,4 @@ module.exports.CONFLICT_PARAMETER = 'Conflict parameter.'
 module.exports.FACEBOOK_LOGIN_FAIL = 'Facebook login failed. Make sure accepted requests'
 module.exports.INCORRECT_USERNAME = 'Incorrect username.',
 module.exports.INCORRECT_PASSWORD = 'Incorrect password.' 
+module.exports.CONFLICT_COMMENT = 'Conflict comment.' 

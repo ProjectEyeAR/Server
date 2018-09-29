@@ -7,6 +7,8 @@ module.exports = ({
 		checkLoggedIn
 	} = require('../middleware/authenticate')
 	const User = require('../model/user')
+	const Following = require('../model/following')
+	const Comment = require('../model/comment')
 	const api = require('express').Router()
 	const hasher = require('pbkdf2-password')()
 	const {
@@ -74,8 +76,18 @@ module.exports = ({
 			let followerQuery = {followUser: userId}
 			let followerCount = await Following.count(followQuery)
 
+			let commentCountQuery = { user: userId }
+			let commentCount = await Comment.count(countQuery)
+
 			user.followingCount = followingCount 
 			user.followerCount = followerCount
+			user.commentCount = commentCount
+
+			if (count > 0) {
+				return res.status(409).json({
+					message: errorMessage.CONFLICT_COMMENT
+				})
+			}
 
 			return res.status(200).json({
 				data: user
@@ -110,8 +122,12 @@ module.exports = ({
 			let followerQuery = {followUser: id}
 			let followerCount = await Following.count(followQuery)
 
+			let commentCountQuery = { user: id }
+			let commentCount = await Comment.count(countQuery)
+
 			user.followingCount = followingCount 
 			user.followerCount = followerCount
+			user.commentCount = commentCount
 
 			if (req.isAuthenticated()) {
 				let userId = req.query.userId
