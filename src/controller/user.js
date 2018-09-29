@@ -106,20 +106,9 @@ module.exports = ({
 	api.get('/:id', checkIdParams, async (req, res) => {
 		let id = req.params.id
 
-		/*
 		try {
-			
-
-		} catch (err) {
-			logger.error(err.message)
-			return res.status(500).json({
-				message: err.message
-			})
-		}
-		*/
-
-		let query = { '_id': id }
-		let user = await User.findOne(query)
+			let query = { '_id': id }
+			let user = await User.findOne(query)
 			
 			let followingCountQuery = { user: id }
     		let followingCount = await Following.count(followingCountQuery)
@@ -145,6 +134,12 @@ module.exports = ({
 			return res.status(200).json({
 				data: user
 			})
+		} catch (err) {
+			logger.error(err.message)
+			return res.status(500).json({
+				message: err.message
+			})
+		}
 	})
 
 	//@desc : 자신의 계정을 삭제함
