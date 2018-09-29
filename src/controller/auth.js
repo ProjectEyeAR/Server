@@ -28,7 +28,7 @@ module.exports = ({
     session: true,
     failureRedirect: '/api/auth/session/fail',
     failureFlash: true
-  }), (req, res) => {
+  }), async (req, res) => {
     let user = req.user
 
     let followingQuery = { user: user._id }
