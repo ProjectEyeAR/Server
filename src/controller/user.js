@@ -110,23 +110,22 @@ module.exports = ({
 			let user = await User.find({})
 				.where('_id')
 				.equals(id)
-
 			
 			let followingQuery = { user: id }
-			let followingCount = await Following.count(followingQuery)
+    		let followingCount = await Following.count(followingQuery)
 
-			let followerQuery = { followUser: id }
-			let followerCount = await Following.count(followerQuery)
+    		let followerQuery = { followUser: id }
+    		let followerCount = await Following.count(followerQuery)
 
-			let commentCountQuery = { user: id }
-			let commentCount = await Comment.count(commentCountQuery)
+    		let commentCountQuery = { user: id }
+    		let commentCount = await Comment.count(commentCountQuery)
 
 			/*
 			let userId = req.user._id
 			let query = { user: userId, followUser: id }
 			let count = await Following.count(query)
 			*/
-			
+
 			user.set('followingCount', followingCount)
     		user.set('followerCount', followerCount)
     		user.set('commentCount', commentCount)
