@@ -82,6 +82,7 @@ module.exports = ({
 			user.set('followingCount', followingCount)
     		user.set('followerCount', followerCount)
     		user.set('commentCount', commentCount)
+    		user.set('following', false)
 
 			return res.status(200).json({
 				data: user
@@ -128,7 +129,7 @@ module.exports = ({
 				let query = { user: userId, followUser: id }
 				let count = await Following.count(query)
 
-				user.set('following', count > 0)
+				user.set('following', count > 0 ? true : false)
 			}
 
 			return res.status(200).json({

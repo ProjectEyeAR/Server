@@ -43,6 +43,7 @@ module.exports = ({
     user.set('followingCount', followingCount)
     user.set('followerCount', followerCount)
     user.set('commentCount', commentCount)
+    user.set('following', false)
 
     res.status(200).json({
       data: user
