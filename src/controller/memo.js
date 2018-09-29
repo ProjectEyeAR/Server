@@ -28,7 +28,7 @@ module.exports = ({
 
     try {
       let query = { '_id': id }
-      let memo = await Memo.findOne(query)
+      let memo = await Memo.findOne(query).populate('user')
 
       let commentCountQuery = { memo: id }
       let commentCount = await Comment.count(commentCountQuery)
@@ -65,6 +65,7 @@ module.exports = ({
       let memos = await Memo.find({
           tags: tag
         })
+        .populate('user')
         .limit(30)
 
       return res.status(200).json({
@@ -120,9 +121,11 @@ module.exports = ({
             type: 'Point',
             coordinates: [parseFloat(lng), parseFloat(lat)],
           },
+          maxDistance: 0.1 / 111.12
           spherical: true
         })
         .select('img loc address')
+        .populate('user')
         .limit(parseInt(limit))
 
       return res.status(200).json({
@@ -151,6 +154,7 @@ module.exports = ({
         .skip(parseInt(skip))
         .where('user')
         .equals(tagetUserId)
+        .populate('user')
         .sort('date')
         .limit(parseInt(limit))
 
