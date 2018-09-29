@@ -6,6 +6,7 @@ module.exports = (init) => {
     level: 'debug',
     format: winston.format.json(),
     transports: [
+      new winston.transports.File({ filename: '/tmp/node.log' }),
       new winston.transports.MongoDB({
         level: 'error',
         db: init.mongoUrl
