@@ -106,8 +106,19 @@ module.exports = ({
 	api.get('/:id', [checkLoggedIn, checkIdParams], async (req, res) => {
 		let id = req.params.id
 
+		/*
 		try {
-			let user = await User.find({})
+			
+
+		} catch (err) {
+			logger.error(err.message)
+			return res.status(500).json({
+				message: err.message
+			})
+		}
+		*/
+
+		let user = await User.find({})
 				.where('_id')
 				.equals(id)
 			
@@ -134,13 +145,6 @@ module.exports = ({
 			return res.status(200).json({
 				data: user
 			})
-
-		} catch (err) {
-			logger.error(err.message)
-			return res.status(500).json({
-				message: err.message
-			})
-		}
 	})
 
 	//@desc : 자신의 계정을 삭제함
