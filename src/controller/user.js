@@ -127,7 +127,8 @@ module.exports = ({
 				let userId = req.query.userId
 				let query = {user: userId, followUser: id}
 				let count = await Following.count(query)
-				user.following = count > 0
+				
+				user.set('following', count > 0)
 			}
 
 			return res.status(200).json({
