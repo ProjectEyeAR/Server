@@ -40,9 +40,9 @@ module.exports = ({
     let commentCountQuery = { user: id }
     let commentCount = await Comment.count(countQuery)
 
-    user.followingCount = followingCount 
-    user.followerCount = followerCount
-    user.commentCount = commentCount
+    user.set('followingCount', followingCount)
+    user.set('followerCount', followerCount)
+    user.set('commentCount', commentCount)
 
     res.status(200).json({
       data: user
