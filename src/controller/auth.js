@@ -38,7 +38,7 @@ module.exports = ({
     let followerCount = await Following.count(followerQuery)
 
     let commentCountQuery = { user: user._id }
-    let commentCount = await Comment.count(countQuery)
+    let commentCount = await Comment.count(commentCountQuery)
 
     user.set('followingCount', followingCount)
     user.set('followerCount', followerCount)
