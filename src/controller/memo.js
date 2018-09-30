@@ -516,7 +516,7 @@ module.exports = ({
     }
   })
 
-  api.get('/:id', checkIdParams, async (req, res) => {
+  api.get('/:id(.{6,})', checkIdParams, async (req, res) => {
     let id = req.params.id
 
     try {
