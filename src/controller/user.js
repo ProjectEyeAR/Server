@@ -14,6 +14,8 @@ module.exports = ({
 	const {
 		checkRegisterUser,
 		checkIdParams,
+		checkDuplicatedEmail,
+		checkDuplicatedDisplayName
 		checkDuplicatedEmailAndDisplayName,
 		checkProfile
 	} = require('../middleware/typeCheck')({
@@ -165,12 +167,39 @@ module.exports = ({
 	//@desc : 자신의 로컬 계정을 수정
 	//@router : PUT http://localhost:3001/api/users
 	//@body : email: String, password: String, displayName: String, img: Object
-	api.put('/', [checkLoggedIn, checkRegisterUser, checkDuplicatedEmailAndDisplayName], (req, res) => {
+	api.patch('/email', [checkLoggedIn, checkRegisterUser, checkDuplicatedEmail], async (req, res) => {
 		let myUserId = req.user._id
-		let img = req.file
 		let email = req.body.email
+
+		let filter = {
+			_id: myUserId
+		}
+		let update = {
+			$set: {
+				email: email,
+			}
+		}
+		let option = {
+			new: true,
+			upsert: false
+		}
+
+		try {
+			let user = await User.findOneAndUpdate(filter, update, option)
+			return res.status(200).json({
+				data: user
+			})
+		} catch (err) {
+			logger.error(err.message)
+			return res.status(500).json({
+				message: err.message
+			})
+		}
+	})
+
+	api.post('/password', [checkLoggedIn, checkRegisterUser], async (req, res) => {
+		let myUserId = req.user._id
 		let password = req.body.password
-		let displayName = req.body.displayName
 
 		return hasher({
 			password: password
@@ -187,11 +216,8 @@ module.exports = ({
 			}
 			let update = {
 				$set: {
-					email: email,
 					password: hash,
 					salt: salt,
-					displayName: displayName,
-					profile: img.location
 				}
 			}
 			let option = {
@@ -211,6 +237,36 @@ module.exports = ({
 				})
 			}
 		})
+	})
+
+	api.patch('/display_name', [checkLoggedIn, checkRegisterUser, checkDuplicatedDisplayName], async (req, res) => {
+		let myUserId = req.user._id
+		let displayName = req.body.displayName
+
+		let filter = {
+				_id: myUserId
+			}
+			let update = {
+				$set: {
+					displayName: displayName,
+				}
+			}
+			let option = {
+				new: true,
+				upsert: false
+			}
+
+			try {
+				let user = await User.findOneAndUpdate(filter, update, option)
+				return res.status(200).json({
+					data: user
+				})
+			} catch (err) {
+				logger.error(err.message)
+				return res.status(500).json({
+					message: err.message
+				})
+			}
 	})
 
 	//@desc : 자신의 프로필 사진을 수정

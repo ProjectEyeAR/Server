@@ -141,6 +141,56 @@ module.exports = ({
         return next()
     }
 
+    const checkDuplicatedEmail = async function (req, res, next) {
+        let email = req.body.email
+
+        try {
+            //이미 가입한 이메일 있는지 확인
+            const emailQuery = {
+                'email': email
+            }
+            let emailCount = await User.count(emailQuery)
+
+            if (emailCount > 0) {
+                return res.status(409).json({
+                    message: errorMessage.CONFLICT_PARAMETER + ' (email)'
+                })
+            }
+
+            return next()
+        } catch (err) {
+            logger.error(err.message)
+            res.status(500).json({
+                message: err.message
+            })
+        }
+    }
+
+    const checkDuplicatedDisplayName = async function (req, res, next) {
+        let displayName = req.body.displayName
+
+        try {
+            //이미 가입한 displayName있는지 확인
+            const displayNameQuery = {
+                'displayName': displayName
+            }
+            let displayNameCount = await User.count(displayNameQuery)
+
+            if (displayNameCount > 0) {
+                return res.status(409).json({
+                    message: errorMessage.CONFLICT_PARAMETER + ' (displayName)'
+                })
+            }
+
+            return next()
+        } catch (err) {
+            logger.error(err.message)
+            res.status(500).json({
+                message: err.message
+            })
+        }
+    }
+
     const checkDuplicatedEmailAndDisplayName = async function (req, res, next) {
         let email = req.body.email
         let displayName = req.body.displayName
@@ -330,6 +380,8 @@ module.exports = ({
         checkRegisterUser,
         checkIdParams,
         checkUserIdQuery,
+        checkDuplicatedEmail,
+        checkDuplicatedDisplayName
         checkDuplicatedEmailAndDisplayName,
         checkProfile,
         checkMemo,
