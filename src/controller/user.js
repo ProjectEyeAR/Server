@@ -132,8 +132,8 @@ module.exports = ({
     		let followerCountQuery = { followUser: id }
     		let followerCount = await Following.count(followerCountQuery)
 
-    		let memoCountQuery = { user: userId }
-			let memoCount = await Memo.count(commentCountQuery)
+    		let memoCountQuery = { user: id }
+			let memoCount = await Memo.count(memoCountQuery)
 
 			user.set('followingCount', followingCount)
     		user.set('followerCount', followerCount)
