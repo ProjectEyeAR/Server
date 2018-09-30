@@ -76,7 +76,8 @@ module.exports = ({
         type: type,
         email: profile.emails[0].value,
         displayName: profile.displayName,
-        profile: profile.photos ? profile.photos[0].value : ''
+        profile: profile.photos ? profile.photos[0].value : '',
+        thumbnail: profile.photos ? profile.photos[0].value : ''
       }
     }
     let option = {
