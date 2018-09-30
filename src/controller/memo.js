@@ -23,38 +23,6 @@ module.exports = ({
   })
   const axios = require('axios')
 
-  api.get('/:id', checkIdParams, async (req, res) => {
-    let id = req.params.id
-
-    try {
-      let query = { '_id': id }
-      let memo = await Memo.findOne(query).populate('user')
-
-      let commentCountQuery = { memo: id }
-      let commentCount = await Comment.count(commentCountQuery)
-
-      memo.set('commentCount', commentCount)
-
-      if (req.isAuthenticated()) {
-        let userId = req.user._id
-        let commentQuery = { user: userId, memo: id }
-        let count = await Comment.count(commentQuery)
-
-        memo.set('hasComment', count > 0)
-      }
-
-      return res.status(200).json({
-        data: memo
-      })
-
-    } catch (err) {
-      logger.error(err.message)
-      return res.status(500).json({
-        message: err.message
-      })
-    }
-  })
-
   //@desc : 주어진 tag가 속한 모든 메모를 출력함
   //@router : GET http://localhost:3001/api/memos/findByTag
   //@query : tag: String
@@ -124,7 +92,6 @@ module.exports = ({
           maxDistance: 0.1 / 111.12,
           spherical: true
         })
-        .select('img text date tags user loc address')
         .populate('user')
         .limit(parseInt(limit))
 
@@ -226,6 +193,38 @@ module.exports = ({
         .equals(myUserId)
 
       return res.status(200).json({})
+
+    } catch (err) {
+      logger.error(err.message)
+      return res.status(500).json({
+        message: err.message
+      })
+    }
+  })
+
+  api.get('/:id', checkIdParams, async (req, res) => {
+    let id = req.params.id
+
+    try {
+      let query = { '_id': id }
+      let memo = await Memo.findOne(query).populate('user')
+
+      let commentCountQuery = { memo: id }
+      let commentCount = await Comment.count(commentCountQuery)
+
+      memo.set('commentCount', commentCount)
+
+      if (req.isAuthenticated()) {
+        let userId = req.user._id
+        let commentQuery = { user: userId, memo: id }
+        let count = await Comment.count(commentQuery)
+
+        memo.set('hasComment', count > 0)
+      }
+
+      return res.status(200).json({
+        data: memo
+      })
 
     } catch (err) {
       logger.error(err.message)
