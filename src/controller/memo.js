@@ -124,6 +124,7 @@ module.exports = ({
           maxDistance: 0.1 / 111.12,
           spherical: true
         })
+        .select('img text date tags user loc address')
         .populate('user')
         .limit(parseInt(limit))
 
