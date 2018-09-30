@@ -10,5 +10,6 @@ module.exports = {
   "HerokuUrl": "https://whispering-sea-68497.herokuapp.com",
   "clientID": process.env.clientID,
   "clientSecret": process.env.clientSecret,
-  "email": process.env.email
+  "email": process.env.email,
+  "defaultProfile": "https://s3.ap-northeast-2.amazonaws.com/seoul-image-server/default_profile.png"
 } 

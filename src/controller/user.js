@@ -1,7 +1,8 @@
 module.exports = ({
 	init,
 	db,
-	logger
+	logger,
+	check
 }) => {
 	const passport = require('passport')
   	require('passport-local').Strategy;
@@ -48,17 +49,19 @@ module.exports = ({
 			 //transform[0], [1]이 고정적이지 않음으로 고정적이게
 			 let originalImg
 			 let thumbnailImg
-			 img.transforms.forEach((o) => {
-			   if (o.id === "original") originalImg = o
-			   if (o.id === "thumbnail") thumbnailImg = o
-			 })
+			 if (check.not.null(img.transforms)) { 
+				img.transforms.forEach((o) => {
+					if (o.id === "original") originalImg = o
+					if (o.id === "thumbnail") thumbnailImg = o
+				})
+			}
 		 
 			let newUser = new User({
 				type: 'local',
 				email: email,
 				password: hash,
-				profile: originalImg.location,
-				thumbnail: thumbnailImg.location,
+				profile: originalImg.location ? originalImg.location : init.defaultProfile,
+				thumbnail: thumbnailImg.location ? thumbnailImg.location : init.defaultProfile,
 				salt: salt,
 				displayName: displayName,
 			})
@@ -298,20 +301,23 @@ module.exports = ({
 		let img = req.file
 
 		//transform[0], [1]이 고정적이지 않음으로 고정적이게
-		let originalImg
-		let thumbnailImg
-		img.transforms.forEach((o) => {
-			if (o.id === "original") originalImg = o
-			if (o.id === "thumbnail") thumbnailImg = o
-		})
+		let originalImg =''
+		let thumbnailImg = ''
+
+		if (check.not.null(img.transforms)) { 
+			img.transforms.forEach((o) => {
+				if (o.id === "original") originalImg = o
+				if (o.id === "thumbnail") thumbnailImg = o
+			})
+		}
 		
 		let filter = {
 			_id: myUserId
 		}
 		let update = {
 			$set: {
-				profile: originalImg.location,
-				thumbnail: thumbnailImg.location
+				profile: originalImg.location ? originalImg.location : init.defaultProfile,
+				thumbnail: thumbnailImg.location ? thumbnailImg.location : init.defaultProfile
 			}
 		}
 		let option = {

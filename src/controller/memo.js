@@ -1,7 +1,8 @@
 module.exports = ({
   init,
   db,
-  logger
+  logger,
+  check
 }) => {
   const Memo = require('../model/memo')
   const Comment = require('../model/comment')
@@ -467,15 +468,17 @@ module.exports = ({
     //transform[0], [1]이 고정적이지 않음으로 고정적이게
     let originalImg
     let thumbnailImg
-    img.transforms.forEach((o) => {
-      if (o.id === "original") originalImg = o
-      if (o.id === "thumbnail") thumbnailImg = o
-    })
+    if (check.not.null(img.transforms)) { 
+			img.transforms.forEach((o) => {
+				if (o.id === "original") originalImg = o
+				if (o.id === "thumbnail") thumbnailImg = o
+			})
+		}
 
     try {
       let memo = await Memo.create({
-        img: originalImg.location,
-        thumbnail: thumbnailImg.location,
+        img: originalImg.location ? originalImg.location : init.defaultProfile,
+        thumbnail: thumbnailImg.location ? thumbnailImg.location : init.defaultProfile,
         text: text,
         loc: loc,
         tags: tags,
@@ -584,10 +587,12 @@ module.exports = ({
     //transform[0], [1]이 고정적이지 않음으로 고정적이게
     let originalImg
     let thumbnailImg
-    img.transforms.forEach((o) => {
-      if (o.id === "original") originalImg = o
-      if (o.id === "thumbnail") thumbnailImg = o
-    })
+    if (check.not.null(img.transforms)) { 
+			img.transforms.forEach((o) => {
+				if (o.id === "original") originalImg = o
+				if (o.id === "thumbnail") thumbnailImg = o
+			})
+		}
 
     let filter = {
       _id: id,
