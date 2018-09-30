@@ -7,6 +7,8 @@ module.exports = ({
 		checkLoggedIn
 	} = require('../middleware/authenticate')
 	const User = require('../model/user')
+	const Following = require('../model/following')
+	const Comment = require('../model/comment')
 	const api = require('express').Router()
 	const hasher = require('pbkdf2-password')()
 	const {
@@ -64,7 +66,35 @@ module.exports = ({
 
 	//@desc : 자신의 유저 정보 가져오기
 	//@router : GET http://localhost:3001/api/users/me
-	api.get('/me', checkLoggedIn, (req, res) => {
+	api.get('/me', checkLoggedIn, async (req, res) => {
+		let userId = req.query.userId
+
+		try {
+			let followingQuery = { user: userId }
+			let followingCount = await Following.count(followingQuery)
+
+			let followerQuery = { followUser: userId }
+			let followerCount = await Following.count(followerQuery)
+
+			let commentCountQuery = { user: userId }
+			let commentCount = await Comment.count(commentCountQuery)
+
+			user.set('followingCount', followingCount)
+    		user.set('followerCount', followerCount)
+    		user.set('commentCount', commentCount)
+    		user.set('following', false)
+
+			return res.status(200).json({
+				data: user
+			})
+
+		} catch (err) {
+			logger.error(err.message)
+			return res.status(500).json({
+				message: err.message
+			})
+		}
+
 		res.status(401).json({
 			data: req.user
 		})
@@ -77,14 +107,33 @@ module.exports = ({
 		let id = req.params.id
 
 		try {
-			let user = await User.find({})
-				.where('_id')
-				.equals(id)
+			let query = { '_id': id }
+			let user = await User.findOne(query)
+			
+			let followingCountQuery = { user: id }
+    		let followingCount = await Following.count(followingCountQuery)
+
+    		let followerCountQuery = { followUser: id }
+    		let followerCount = await Following.count(followerCountQuery)
+
+    		let commentCountQuery = { user: id }
+    		let commentCount = await Comment.count(commentCountQuery)
+
+			user.set('followingCount', followingCount)
+    		user.set('followerCount', followerCount)
+    		user.set('commentCount', commentCount)
+
+			if (req.isAuthenticated()) {
+				let userId = req.user._id
+				let followingQuery = { user: userId, followUser: id }
+				let count = await Following.count(followingQuery)
+
+				user.set('following', count > 0)
+			}
 
 			return res.status(200).json({
 				data: user
 			})
-
 		} catch (err) {
 			logger.error(err.message)
 			return res.status(500).json({

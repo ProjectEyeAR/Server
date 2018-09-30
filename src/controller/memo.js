@@ -4,6 +4,7 @@ module.exports = ({
   logger
 }) => {
   const Memo = require('../model/memo')
+  const Comment = require('../model/comment')
   const api = require('express').Router()
   const {
     checkLoggedIn
@@ -12,6 +13,7 @@ module.exports = ({
     checkMemo,
     checkMemoTextAndImage,
     checkIdParams,
+    checkUserIdQuery,
     checkSkipAndLimit,
     checkLngAndLat,
     checkTag
@@ -31,6 +33,7 @@ module.exports = ({
       let memos = await Memo.find({
           tags: tag
         })
+        .populate('user')
         .limit(30)
 
       return res.status(200).json({
@@ -47,36 +50,13 @@ module.exports = ({
   //@desc : 특정 유저에게 속한 모든 메모의 개수를 보여줌
   //@router : GET http://localhost:3001/api/memos/:id/count
   //@params : id: String
-  api.get('/:id/count', checkIdParams, async (req, res) => {
-    let id = req.params.id
+  api.get('/count', checkUserIdQuery, async (req, res) => {
+    let id = req.query.userId
 
     try {
       let count = await Memo.find({})
         .where('user')
         .equals(id)
-        .count()
-
-      return res.status(200).json({
-        data: count
-      })
-
-    } catch (err) {
-      logger.error(err.message)
-      return res.status(500).json({
-        message: err.message
-      })
-    }
-  })
-
-  //@desc : 자신에게 속한 모든 메모의 개수를 보여줌
-  //@router : GET http://localhost:3001/api/memos/count
-  api.get('/count', checkLoggedIn, async (req, res) => {
-    let myUserId = req.user._id
-
-    try {
-      let count = await Memo.find({})
-        .where('user')
-        .equals(myUserId)
         .count()
 
       return res.status(200).json({
@@ -109,9 +89,10 @@ module.exports = ({
             type: 'Point',
             coordinates: [parseFloat(lng), parseFloat(lat)],
           },
+          maxDistance: 0.1 / 111.12,
           spherical: true
         })
-        .select('img thumbnail loc address')
+        .populate('user')
         .limit(parseInt(limit))
 
       return res.status(200).json({
@@ -130,8 +111,8 @@ module.exports = ({
   //@router : GET http://localhost:3001/api/memos/:id
   //@params : id: String
   //@query : skip: String, limit: String
-  api.get('/:id', [checkSkipAndLimit, checkIdParams], async (req, res) => {
-    let tagetUserId = req.params.id
+  api.get('/', [checkSkipAndLimit, checkUserIdQuery], async (req, res) => {
+    let tagetUserId = req.query.userId
     let skip = req.query.skip
     let limit = req.query.limit
 
@@ -140,34 +121,7 @@ module.exports = ({
         .skip(parseInt(skip))
         .where('user')
         .equals(tagetUserId)
-        .sort('date')
-        .limit(parseInt(limit))
-
-      return res.status(200).json({
-        data: memos
-      })
-
-    } catch (err) {
-      logger.error(err.message)
-      return res.status(500).json({
-        message: err.message
-      })
-    }
-  })
-
-  //@desc : 자신에게 속해있는 모든 메모 출력
-  //@router : GET http://localhost:3001/api/memos/:id
-  //@query : skip: String, limit: String
-  api.get('/', [checkLoggedIn, checkSkipAndLimit], async (req, res) => {
-    let myUserId = req.user._id
-    let skip = req.query.skip
-    let limit = req.query.limit
-
-    try {
-      let memos = await Memo.find({})
-        .skip(parseInt(skip))
-        .where('user')
-        .equals(myUserId)
+        .populate('user')
         .sort('date')
         .limit(parseInt(limit))
 
@@ -248,6 +202,38 @@ module.exports = ({
         .equals(myUserId)
 
       return res.status(200).json({})
+
+    } catch (err) {
+      logger.error(err.message)
+      return res.status(500).json({
+        message: err.message
+      })
+    }
+  })
+
+  api.get('/:id', checkIdParams, async (req, res) => {
+    let id = req.params.id
+
+    try {
+      let query = { '_id': id }
+      let memo = await Memo.findOne(query).populate('user')
+
+      let commentCountQuery = { memo: id }
+      let commentCount = await Comment.count(commentCountQuery)
+
+      memo.set('commentCount', commentCount)
+
+      if (req.isAuthenticated()) {
+        let userId = req.user._id
+        let commentQuery = { user: userId, memo: id }
+        let count = await Comment.count(commentQuery)
+
+        memo.set('hasComment', count > 0)
+      }
+
+      return res.status(200).json({
+        data: memo
+      })
 
     } catch (err) {
       logger.error(err.message)

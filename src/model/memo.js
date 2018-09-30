@@ -43,7 +43,7 @@ const memoSchema = new Schema({
   address: {
     type: Object
   }
-});
+}, { strict: false });
 
 memoSchema.index({
   loc: '2dsphere'
