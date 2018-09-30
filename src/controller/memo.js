@@ -20,11 +20,6 @@ module.exports = ({
     init
   })
   const axios = require('axios')
-  // const fs = require('fs'),
-  //   gm = require('gm').subClass({
-  //     imageMagick: true
-  //   })
-  // const request = require('request')
 
   //@desc : 주어진 tag가 속한 모든 메모를 출력함
   //@router : GET http://localhost:3001/api/memos/findByTag
@@ -116,23 +111,8 @@ module.exports = ({
           },
           spherical: true
         })
-        .select('img loc address')
+        .select('img thumbnail loc address')
         .limit(parseInt(limit))
-
-      // let chunks = []
-      // const stream2 = gm(request('https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png'))
-      //   .thumbnail('50', '50', '!')
-      //   .stream()
-
-      // stream2.on('data', function (chunk) {
-      //   chunks.push(chunk)
-      // })
-
-      // stream2.on('end', function () {
-      //   var result = Buffer.concat(chunks);
-      //   console.log('final result:', result.toString('base64'));
-      // })
-
 
       return res.status(200).json({
         data: memos
@@ -225,9 +205,18 @@ module.exports = ({
         })
       })
 
+    //transform[0], [1]이 고정적이지 않음으로 고정적이게
+    let originalImg
+    let thumbnailImg
+    img.transforms.forEach((o) => {
+      if (o.id === "original") originalImg = o
+      if (o.id === "thumbnail") thumbnailImg = o
+    })
+
     try {
       let memo = await Memo.create({
-        img: img.location,
+        img: originalImg.location,
+        thumbnail: thumbnailImg.location,
         text: text,
         loc: loc,
         tags: tags,
@@ -301,13 +290,22 @@ module.exports = ({
     let img = req.file
     let tags = req.body.tags
 
+    //transform[0], [1]이 고정적이지 않음으로 고정적이게
+    let originalImg
+    let thumbnailImg
+    img.transforms.forEach((o) => {
+      if (o.id === "original") originalImg = o
+      if (o.id === "thumbnail") thumbnailImg = o
+    })
+
     let filter = {
       _id: id,
       user: myUserId
     }
     let update = {
       $set: {
-        img: img.location,
+        img: originalImg.location,
+        thumbnail: thumbnailImg.location,
         tags: tags
       }
     }
