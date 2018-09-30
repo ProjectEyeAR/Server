@@ -11,7 +11,7 @@ module.exports = ({
     checkLoggedIn
   } = require('../middleware/authenticate')
   const Following = require('../model/following')
-  const Comment = require('../model/comment')
+  const Memo = require('../model/memo')
 
   //@desc : login 실패시 failureRedircet에 의해 작동되는 라우터
   api.get('/session/fail', (req, res) => {
@@ -37,12 +37,12 @@ module.exports = ({
     let followerQuery = { followUser: user._id }
     let followerCount = await Following.count(followerQuery)
 
-    let commentCountQuery = { user: user._id }
-    let commentCount = await Comment.count(commentCountQuery)
+    let memoCountQuery = { user: user._id }
+    let memoCount = await Memo.count(memoCountQuery)
 
     user.set('followingCount', followingCount)
     user.set('followerCount', followerCount)
-    user.set('commentCount', commentCount)
+    user.set('memoCount', memoCount)
     user.set('following', false)
 
     res.status(200).json({

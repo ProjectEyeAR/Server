@@ -10,7 +10,7 @@ module.exports = ({
 	} = require('../middleware/authenticate')
 	const User = require('../model/user')
 	const Following = require('../model/following')
-	const Comment = require('../model/comment')
+	const Memo = require('../model/memo')
 	const api = require('express').Router()
 	const hasher = require('pbkdf2-password')()
 	const {
@@ -80,12 +80,12 @@ module.exports = ({
 			let followerQuery = { followUser: userId }
 			let followerCount = await Following.count(followerQuery)
 
-			let commentCountQuery = { user: userId }
-			let commentCount = await Comment.count(commentCountQuery)
+			let memoCountQuery = { user: userId }
+			let memoCount = await Memo.count(commentCountQuery)
 
 			user.set('followingCount', followingCount)
     		user.set('followerCount', followerCount)
-    		user.set('commentCount', commentCount)
+    		user.set('memoCount', memoCount)
     		user.set('following', false)
 
 			return res.status(200).json({
@@ -120,12 +120,12 @@ module.exports = ({
     		let followerCountQuery = { followUser: id }
     		let followerCount = await Following.count(followerCountQuery)
 
-    		let commentCountQuery = { user: id }
-    		let commentCount = await Comment.count(commentCountQuery)
+    		let memoCountQuery = { user: userId }
+			let memoCount = await Memo.count(commentCountQuery)
 
 			user.set('followingCount', followingCount)
     		user.set('followerCount', followerCount)
-    		user.set('commentCount', commentCount)
+    		user.set('memoCount', memoCount)
 
 			if (req.isAuthenticated()) {
 				let userId = req.user._id
