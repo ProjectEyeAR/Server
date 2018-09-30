@@ -3,6 +3,8 @@ module.exports = ({
 	db,
 	logger
 }) => {
+	const passport = require('passport')
+  	require('passport-local').Strategy;
 	const {
 		checkLoggedIn
 	} = require('../middleware/authenticate')
@@ -197,12 +199,16 @@ module.exports = ({
 		}
 	})
 
-	api.post('/password', [checkLoggedIn, checkRegisterUser], async (req, res) => {
+	api.post('/password', passport.authenticate('local', {
+		session: false,
+	    failureRedirect: '/api/auth/session/fail',
+	    failureFlash: true
+	}), async (req, res) => {
 		let myUserId = req.user._id
-		let password = req.body.password
+		let newPassword = req.body.newPassword
 
 		return hasher({
-			password: password
+			password: newPassword
 		}, async function (err, pass, salt, hash) {
 			if (err) {
 				logger.error(err.message)
