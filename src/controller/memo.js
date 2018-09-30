@@ -112,12 +112,31 @@ module.exports = ({
     }
   })
 
-  api.get('/group/country', checkCountry, async (req, res) => {
-    let country = req.query.country
+  api.get('/group/country', checkLngAndLat, async (req, res) => {
+    let lng = req.query.lng
+    let lat = req.query.lat
+    let address
+
+    await axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&email=${init.email}`)
+      .then(res => {
+        address = res.data.address
+      })
+      .catch(err => {
+        logger.error(err.message)
+        return res.status(500).json({
+          message: err.message
+        })
+      })
+
+    if (!('country' in address)) {
+      return res.status(200).json({
+        data: []
+      })
+    }
 
     try {
       let memos = await Memo.aggregate([
-        { $match: { 'address.country': country }},
+        { $match: { 'address.country': address.country }},
         { $sort: { date: -1 } },
         {
           $group: {
@@ -142,12 +161,31 @@ module.exports = ({
     }
   })
 
-  api.get('/group/state', checkState, async (req, res) => {
-    let state = req.query.state
+  api.get('/group/state', checkLngAndLat, async (req, res) => {
+    let lng = req.query.lng
+    let lat = req.query.lat
+    let address
+
+    await axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&email=${init.email}`)
+      .then(res => {
+        address = res.data.address
+      })
+      .catch(err => {
+        logger.error(err.message)
+        return res.status(500).json({
+          message: err.message
+        })
+      })
+
+    if (!('state' in address)) {
+      return res.status(200).json({
+        data: []
+      })
+    }
 
     try {
       let memos = await Memo.aggregate([
-        { $match: { 'address.state': state }},
+        { $match: { 'address.state': address.state }},
         { $sort: { date: -1 } },
         {
           $group: {
@@ -172,12 +210,31 @@ module.exports = ({
     }
   })
 
-  api.get('/group/city', checkCity, async (req, res) => {
-    let city = req.query.city
+  api.get('/group/city', checkLngAndLat, async (req, res) => {
+    let lng = req.query.lng
+    let lat = req.query.lat
+    let address
+
+    await axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&email=${init.email}`)
+      .then(res => {
+        address = res.data.address
+      })
+      .catch(err => {
+        logger.error(err.message)
+        return res.status(500).json({
+          message: err.message
+        })
+      })
+
+    if (!('city' in address)) {
+      return res.status(200).json({
+        data: []
+      })
+    }
 
     try {
       let memos = await Memo.aggregate([
-        { $match: { 'address.city': city }},
+        { $match: { 'address.city': address.city }},
         { $sort: { date: -1 } },
         {
           $group: {
@@ -202,12 +259,31 @@ module.exports = ({
     }
   })
 
-  api.get('/group/town', checkTown, async (req, res) => {
-    let town = req.query.town
+  api.get('/group/town', checkLngAndLat, async (req, res) => {
+    let lng = req.query.lng
+    let lat = req.query.lat
+    let address
+
+    await axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&email=${init.email}`)
+      .then(res => {
+        address = res.data.address
+      })
+      .catch(err => {
+        logger.error(err.message)
+        return res.status(500).json({
+          message: err.message
+        })
+      })
+
+    if (!('town' in address)) {
+      return res.status(200).json({
+        data: []
+      })
+    }
 
     try {
       let memos = await Memo.aggregate([
-        { $match: { 'address.town': town }},
+        { $match: { 'address.town': address.town }},
         { $sort: { date: -1 } },
         {
           $group: {
