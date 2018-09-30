@@ -373,6 +373,66 @@ module.exports = ({
         return next()
     }
 
+    const checkCountry = function (req, res, next) {
+        let country = req.query.country
+
+        if (check.not.string(country)) {
+            return res.status(400).json({
+                message: errorMessage.INVALID_QUERY_PARAMETER + ' (country)'
+            })
+        }
+
+        return next()
+    }
+
+    const checkState = function (req, res, next) {
+        let state = req.query.state
+
+        if (check.not.string(state)) {
+            return res.status(400).json({
+                message: errorMessage.INVALID_QUERY_PARAMETER + ' (state)'
+            })
+        }
+
+        return next()
+    }
+
+    const checkCity = function (req, res, next) {
+        let city = req.query.city
+
+        if (check.not.string(city)) {
+            return res.status(400).json({
+                message: errorMessage.INVALID_QUERY_PARAMETER + ' (city)'
+            })
+        }
+
+        return next()
+    }
+
+    const checkTown = function (req, res, next) {
+        let town = req.query.town
+
+        if (check.not.string(town)) {
+            return res.status(400).json({
+                message: errorMessage.INVALID_QUERY_PARAMETER + ' (town)'
+            })
+        }
+
+        return next()
+    }
+
+    const checkVillage = function (req, res, next) {
+        let village = req.query.village
+
+        if (check.not.string(village)) {
+            return res.status(400).json({
+                message: errorMessage.INVALID_QUERY_PARAMETER + ' (village)'
+            })
+        }
+
+        return next()
+    }
+
     return {
         checkEmojiAndMemo,
         checkEmoji,
@@ -388,6 +448,11 @@ module.exports = ({
         checkMemoTextAndImage,
         checkSkipAndLimit,
         checkLngAndLat,
-        checkTag
+        checkTag,
+        checkCountry,
+        checkState,
+        checkCity,
+        checkTown,
+        checkVillage
     }
 }

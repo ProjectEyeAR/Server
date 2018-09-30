@@ -16,7 +16,12 @@ module.exports = ({
     checkUserIdQuery,
     checkSkipAndLimit,
     checkLngAndLat,
-    checkTag
+    checkTag,
+    checkCountry,
+    checkState,
+    checkCity,
+    checkTown,
+    checkVillage
   } = require('../middleware/typeCheck')({
     logger,
     init
@@ -26,7 +31,7 @@ module.exports = ({
   //@desc : 주어진 tag가 속한 모든 메모를 출력함
   //@router : GET http://localhost:3001/api/memos/findByTag
   //@query : tag: String
-  api.get('/findByTag', checkTag, async (req, res) => {
+  api.get('/tags', checkTag, async (req, res) => {
     let tag = req.query.tag
 
     try {
@@ -93,6 +98,230 @@ module.exports = ({
           spherical: true
         })
         .populate('user')
+        .limit(parseInt(limit))
+
+      return res.status(200).json({
+        data: memos
+      })
+
+    } catch (err) {
+      logger.error(err.message)
+      return res.status(500).json({
+        message: err.message
+      })
+    }
+  })
+
+  api.get('/group/country', checkCountry, async (req, res) => {
+    let country = req.query.country
+
+    try {
+      let memos = await Memo.aggregate([
+        { $match: { address.country: country }},
+        { $sort: { date: -1 } },
+        {
+          $group: {
+            _id: '$address.state',
+            loc: { $first: '$loc' },
+            thumbnail: { $first: '$thumbnail' },
+            img: { $first: '$img' },
+            count: { $sum: 1 }
+          }
+        }
+      ])
+
+      return res.status(200).json({
+        data: memos
+      })
+
+    } catch (err) {
+      logger.error(err.message)
+      return res.status(500).json({
+        message: err.message
+      })
+    }
+  })
+
+  api.get('/group/state', checkState, async (req, res) => {
+    let state = req.query.state
+
+    try {
+      let memos = await Memo.aggregate([
+        { $match: { address.state: state }},
+        { $sort: { date: -1 } },
+        {
+          $group: {
+            _id: '$address.city',
+            loc: { $first: '$loc' },
+            thumbnail: { $first: '$thumbnail' },
+            img: { $first: '$img' },
+            count: { $sum: 1 }
+          }
+        }
+      ])
+
+      return res.status(200).json({
+        data: memos
+      })
+
+    } catch (err) {
+      logger.error(err.message)
+      return res.status(500).json({
+        message: err.message
+      })
+    }
+  })
+
+  api.get('/group/city', checkCity, async (req, res) => {
+    let city = req.query.city
+
+    try {
+      let memos = await Memo.aggregate([
+        { $match: { address.city: city }},
+        { $sort: { date: -1 } },
+        {
+          $group: {
+            _id: '$address.town',
+            loc: { $first: '$loc' },
+            thumbnail: { $first: '$thumbnail' },
+            img: { $first: '$img' },
+            count: { $sum: 1 }
+          }
+        }
+      ])
+
+      return res.status(200).json({
+        data: memos
+      })
+
+    } catch (err) {
+      logger.error(err.message)
+      return res.status(500).json({
+        message: err.message
+      })
+    }
+  })
+
+  api.get('/group/town', checkTown, async (req, res) => {
+    let town = req.query.town
+
+    try {
+      let memos = await Memo.aggregate([
+        { $match: { address.town: town }},
+        { $sort: { date: -1 } },
+        {
+          $group: {
+            _id: '$address.village',
+            loc: { $first: '$loc' },
+            thumbnail: { $first: '$thumbnail' },
+            img: { $first: '$img' },
+            count: { $sum: 1 }
+          }
+        }
+      ])
+
+      return res.status(200).json({
+        data: memos
+      })
+
+    } catch (err) {
+      logger.error(err.message)
+      return res.status(500).json({
+        message: err.message
+      })
+    }
+  })
+
+  api.get('/state', checkState, async (req, res) => {
+    let state = req.query.state
+    let skip = req.query.skip
+    let limit = req.query.limit
+
+    try {
+      let memos = await Memo.find({})
+        .skip(parseInt(skip))
+        .where('address.state')
+        .equals(state)
+        .populate('user')
+        .sort('date')
+        .limit(parseInt(limit))
+
+      return res.status(200).json({
+        data: memos
+      })
+
+    } catch (err) {
+      logger.error(err.message)
+      return res.status(500).json({
+        message: err.message
+      })
+    }
+  })
+
+  api.get('/city', checkCity, async (req, res) => {
+    let city = req.query.city
+    let skip = req.query.skip
+    let limit = req.query.limit
+
+    try {
+      let memos = await Memo.find({})
+        .skip(parseInt(skip))
+        .where('address.city')
+        .equals(city)
+        .populate('user')
+        .sort('date')
+        .limit(parseInt(limit))
+
+      return res.status(200).json({
+        data: memos
+      })
+
+    } catch (err) {
+      logger.error(err.message)
+      return res.status(500).json({
+        message: err.message
+      })
+    }
+  })
+
+  api.get('/town', checkTown, async (req, res) => {
+    let town = req.query.town
+    let skip = req.query.skip
+    let limit = req.query.limit
+
+    try {
+      let memos = await Memo.find({})
+        .skip(parseInt(skip))
+        .where('address.town')
+        .equals(town)
+        .populate('user')
+        .sort('date')
+        .limit(parseInt(limit))
+
+      return res.status(200).json({
+        data: memos
+      })
+
+    } catch (err) {
+      logger.error(err.message)
+      return res.status(500).json({
+        message: err.message
+      })
+    }
+  })
+
+  api.get('/village', checkVillage, async (req, res) => {
+    let village = req.query.village
+    let skip = req.query.skip
+    let limit = req.query.limit
+
+    try {
+      let memos = await Memo.find({})
+        .skip(parseInt(skip))
+        .where('address.village')
+        .equals(village)
+        .populate('user')
+        .sort('date')
         .limit(parseInt(limit))
 
       return res.status(200).json({
