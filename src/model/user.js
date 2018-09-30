@@ -21,6 +21,9 @@ const userSchema = new Schema({
   profile: {
     type: String
   },
+  thumbnail: {
+    type: String
+  },
   date: {
     type: Date,
     default: Date.now

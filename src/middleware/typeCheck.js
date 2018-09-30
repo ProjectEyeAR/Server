@@ -441,7 +441,7 @@ module.exports = ({
         checkIdParams,
         checkUserIdQuery,
         checkDuplicatedEmail,
-        checkDuplicatedDisplayName
+        checkDuplicatedDisplayName,
         checkDuplicatedEmailAndDisplayName,
         checkProfile,
         checkMemo,

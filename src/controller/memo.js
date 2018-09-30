@@ -117,7 +117,7 @@ module.exports = ({
 
     try {
       let memos = await Memo.aggregate([
-        { $match: { address.country: country }},
+        { $match: { 'address.country': country }},
         { $sort: { date: -1 } },
         {
           $group: {
@@ -147,7 +147,7 @@ module.exports = ({
 
     try {
       let memos = await Memo.aggregate([
-        { $match: { address.state: state }},
+        { $match: { 'address.state': state }},
         { $sort: { date: -1 } },
         {
           $group: {
@@ -177,7 +177,7 @@ module.exports = ({
 
     try {
       let memos = await Memo.aggregate([
-        { $match: { address.city: city }},
+        { $match: { 'address.city': city }},
         { $sort: { date: -1 } },
         {
           $group: {
@@ -207,7 +207,7 @@ module.exports = ({
 
     try {
       let memos = await Memo.aggregate([
-        { $match: { address.town: town }},
+        { $match: { 'address.town': town }},
         { $sort: { date: -1 } },
         {
           $group: {

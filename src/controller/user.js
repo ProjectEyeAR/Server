@@ -17,7 +17,7 @@ module.exports = ({
 		checkRegisterUser,
 		checkIdParams,
 		checkDuplicatedEmail,
-		checkDuplicatedDisplayName
+		checkDuplicatedDisplayName,
 		checkDuplicatedEmailAndDisplayName,
 		checkProfile
 	} = require('../middleware/typeCheck')({
@@ -45,11 +45,20 @@ module.exports = ({
 				})
 			}
 
+			 //transform[0], [1]이 고정적이지 않음으로 고정적이게
+			 let originalImg
+			 let thumbnailImg
+			 img.transforms.forEach((o) => {
+			   if (o.id === "original") originalImg = o
+			   if (o.id === "thumbnail") thumbnailImg = o
+			 })
+		 
 			let newUser = new User({
 				type: 'local',
 				email: email,
 				password: hash,
-				profile: img.location,
+				profile: originalImg.location,
+				thumbnail: thumbnailImg.location,
 				salt: salt,
 				displayName: displayName,
 			})
@@ -166,9 +175,9 @@ module.exports = ({
 		}
 	})
 
-	//@desc : 자신의 로컬 계정을 수정
-	//@router : PUT http://localhost:3001/api/users
-	//@body : email: String, password: String, displayName: String, img: Object
+	//@desc : 자신의 이메일을 수정
+	//@router : PATCH http://localhost:3001/api/users/email
+	//@body : email: String
 	api.patch('/email', [checkLoggedIn, checkRegisterUser, checkDuplicatedEmail], async (req, res) => {
 		let myUserId = req.user._id
 		let email = req.body.email
@@ -199,6 +208,9 @@ module.exports = ({
 		}
 	})
 
+	//@desc : 자신의 비밀번호를 수정
+	//@router : POST http://localhost:3001/api/users/display_name
+	//@body : displayName: String
 	api.post('/password', passport.authenticate('local', {
 		session: false,
 	    failureRedirect: '/api/auth/session/fail',
@@ -245,6 +257,9 @@ module.exports = ({
 		})
 	})
 
+	//@desc : 자신의 DisplayName을 수정
+	//@router : PATCH http://localhost:3001/api/users/display_name
+	//@body : displayName: String
 	api.patch('/display_name', [checkLoggedIn, checkRegisterUser, checkDuplicatedDisplayName], async (req, res) => {
 		let myUserId = req.user._id
 		let displayName = req.body.displayName
@@ -276,18 +291,27 @@ module.exports = ({
 	})
 
 	//@desc : 자신의 프로필 사진을 수정
-	//@router : PUT http://localhost:3001/api/users/profile
+	//@router : PATCH http://localhost:3001/api/users/profile
 	//@body : img: Object
-	api.put('/profile', [checkLoggedIn, checkProfile], async (req, res) => {
+	api.patch('/profile', [checkLoggedIn, checkProfile], async (req, res) => {
 		let myUserId = req.user._id
 		let img = req.file
 
+		//transform[0], [1]이 고정적이지 않음으로 고정적이게
+		let originalImg
+		let thumbnailImg
+		img.transforms.forEach((o) => {
+			if (o.id === "original") originalImg = o
+			if (o.id === "thumbnail") thumbnailImg = o
+		})
+		
 		let filter = {
 			_id: myUserId
 		}
 		let update = {
 			$set: {
-				profile: img.location
+				profile: originalImg.location,
+				thumbnail: thumbnailImg.location
 			}
 		}
 		let option = {
