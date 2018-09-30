@@ -124,7 +124,6 @@ module.exports = ({
           maxDistance: 0.1 / 111.12,
           spherical: true
         })
-        .select('img loc address')
         .populate('user')
         .limit(parseInt(limit))
 
