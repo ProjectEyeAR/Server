@@ -49,7 +49,7 @@ module.exports = ({
 			 //transform[0], [1]이 고정적이지 않음으로 고정적이게
 			 let originalImg
 			 let thumbnailImg
-			 if (check.not.null(img.transforms)) { 
+			 if (check.not.undefined(img)) { 
 				img.transforms.forEach((o) => {
 					if (o.id === "original") originalImg = o
 					if (o.id === "thumbnail") thumbnailImg = o
@@ -60,8 +60,8 @@ module.exports = ({
 				type: 'local',
 				email: email,
 				password: hash,
-				profile: originalImg.location ? originalImg.location : init.defaultProfile,
-				thumbnail: thumbnailImg.location ? thumbnailImg.location : init.defaultProfile,
+				profile: originalImg ? originalImg.location : init.defaultProfile,
+				thumbnail: thumbnailImg ? thumbnailImg.location : init.defaultProfile,
 				salt: salt,
 				displayName: displayName,
 			})
@@ -93,7 +93,7 @@ module.exports = ({
 			let followerCount = await Following.count(followerQuery)
 
 			let memoCountQuery = { user: userId }
-			let memoCount = await Memo.count(commentCountQuery)
+			let memoCount = await Memo.count(memoCountQuery)
 
 			user.set('followingCount', followingCount)
     		user.set('followerCount', followerCount)
@@ -132,7 +132,7 @@ module.exports = ({
     		let followerCountQuery = { followUser: id }
     		let followerCount = await Following.count(followerCountQuery)
 
-    		let memoCountQuery = { user: id }
+    		let memoCountQuery = { user: userId }
 			let memoCount = await Memo.count(memoCountQuery)
 
 			user.set('followingCount', followingCount)
@@ -304,7 +304,7 @@ module.exports = ({
 		let originalImg =''
 		let thumbnailImg = ''
 
-		if (check.not.null(img.transforms)) { 
+		if (check.not.undefined(img)) { 
 			img.transforms.forEach((o) => {
 				if (o.id === "original") originalImg = o
 				if (o.id === "thumbnail") thumbnailImg = o
@@ -316,8 +316,8 @@ module.exports = ({
 		}
 		let update = {
 			$set: {
-				profile: originalImg.location ? originalImg.location : init.defaultProfile,
-				thumbnail: thumbnailImg.location ? thumbnailImg.location : init.defaultProfile
+				profile: originalImg ? originalImg.location : init.defaultProfile,
+				thumbnail: thumbnailImg ? thumbnailImg.location : init.defaultProfile
 			}
 		}
 		let option = {

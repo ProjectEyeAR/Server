@@ -468,7 +468,7 @@ module.exports = ({
     //transform[0], [1]이 고정적이지 않음으로 고정적이게
     let originalImg
     let thumbnailImg
-    if (check.not.null(img.transforms)) { 
+    if (check.not.undefined(img)) { 
 			img.transforms.forEach((o) => {
 				if (o.id === "original") originalImg = o
 				if (o.id === "thumbnail") thumbnailImg = o
@@ -477,8 +477,8 @@ module.exports = ({
 
     try {
       let memo = await Memo.create({
-        img: originalImg.location ? originalImg.location : init.defaultProfile,
-        thumbnail: thumbnailImg.location ? thumbnailImg.location : init.defaultProfile,
+        img: originalImg ? originalImg.location : init.defaultProfile,
+        thumbnail: thumbnailImg ? thumbnailImg.location : init.defaultProfile,
         text: text,
         loc: loc,
         tags: tags,
@@ -587,7 +587,7 @@ module.exports = ({
     //transform[0], [1]이 고정적이지 않음으로 고정적이게
     let originalImg
     let thumbnailImg
-    if (check.not.null(img.transforms)) { 
+    if (check.not.undefined(img)) { 
 			img.transforms.forEach((o) => {
 				if (o.id === "original") originalImg = o
 				if (o.id === "thumbnail") thumbnailImg = o
@@ -600,8 +600,8 @@ module.exports = ({
     }
     let update = {
       $set: {
-        img: originalImg.location,
-        thumbnail: thumbnailImg.location,
+        img: originalImg ? originalImg.location : init.defaultProfile,
+        thumbnail: thumbnailImg ? thumbnailImg.location : init.defaultProfile,
         tags: tags
       }
     }

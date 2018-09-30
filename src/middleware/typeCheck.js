@@ -78,22 +78,22 @@ module.exports = ({
 
     const checkRegisterUser = function (req, res, next) {
         single(req, res, function (err) {
-            if (err) {
-                return res.status(400).json({
-                    message: errorMessage.UNEXPECTED_FIELD_ERROR + ' (img)'
-                })
-            }
+            // if (err) {
+            //     return res.status(400).json({
+            //         message: errorMessage.UNEXPECTED_FIELD_ERROR + ' (img)'
+            //     })
+            // }
 
             let img = req.file
             let email = req.body.email
             let password = req.body.password
             let displayName = req.body.displayName
 
-            if (check.not.object(img)) {
-                return res.status(400).json({
-                    message: errorMessage.INVALID_POST_REQUEST + ' (img)'
-                })
-            }
+            // if (check.not.object(img)) {
+            //     return res.status(400).json({
+            //         message: errorMessage.INVALID_POST_REQUEST + ' (img)'
+            //     })
+            // }
 
             if (check.not.string(email) || !EMAIL_REGEX.test(email)) {
                 return res.status(400).json({
