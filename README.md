@@ -2,7 +2,7 @@
 # 서울시앱공모전  Server-side 
 ## Start up
 1. *yarn dev* or *npm run dev*
-2. At First, sign up your account to the server.
+2. At First, sign up your account on the server.
 
 > POST http://localhost:3001/api/users
 
