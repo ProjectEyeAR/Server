@@ -87,7 +87,7 @@ module.exports = ({
 
     try {
       let memos = await Memo.find({})
-        .skip(parseInt(skip))
+        .skip(skip)
         .where('loc')
         .near({
           center: {
@@ -98,7 +98,7 @@ module.exports = ({
           spherical: true
         })
         .populate('user')
-        .limit(parseInt(limit))
+        .limit(limit)
 
       return res.status(200).json({
         data: memos
@@ -315,12 +315,12 @@ module.exports = ({
 
     try {
       let memos = await Memo.find({})
-        .skip(parseInt(skip))
+        .skip(skip)
         .where('address.state')
         .equals(state)
         .populate('user')
         .sort('date')
-        .limit(parseInt(limit))
+        .limit(limit)
 
       return res.status(200).json({
         data: memos
@@ -341,12 +341,12 @@ module.exports = ({
 
     try {
       let memos = await Memo.find({})
-        .skip(parseInt(skip))
+        .skip(skip)
         .where('address.city')
         .equals(city)
         .populate('user')
         .sort('date')
-        .limit(parseInt(limit))
+        .limit(limit)
 
       return res.status(200).json({
         data: memos
@@ -367,12 +367,12 @@ module.exports = ({
 
     try {
       let memos = await Memo.find({})
-        .skip(parseInt(skip))
+        .skip(skip)
         .where('address.town')
         .equals(town)
         .populate('user')
         .sort('date')
-        .limit(parseInt(limit))
+        .limit(limit)
 
       return res.status(200).json({
         data: memos
@@ -393,12 +393,12 @@ module.exports = ({
 
     try {
       let memos = await Memo.find({})
-        .skip(parseInt(skip))
+        .skip(skip)
         .where('address.village')
         .equals(village)
         .populate('user')
         .sort('date')
-        .limit(parseInt(limit))
+        .limit(limit)
 
       return res.status(200).json({
         data: memos
@@ -423,12 +423,12 @@ module.exports = ({
 
     try {
       let memos = await Memo.find({})
-        .skip(parseInt(skip))
+        .skip(skip)
         .where('user')
         .equals(tagetUserId)
         .populate('user')
         .sort('date')
-        .limit(parseInt(limit))
+        .limit(limit)
 
       return res.status(200).json({
         data: memos
