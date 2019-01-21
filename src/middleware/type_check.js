@@ -35,6 +35,30 @@ module.exports = ({
         return next()
     }
 
+    const checkUserId = function (req, res, next) {
+        let userId = req.query.userId
+
+		if (check.not.string(userId)) {
+			return res.status(404).json({
+				message: errorMessage.INVALID_QUERY_PARAMETER + ' (userId)'
+			})
+        }
+        
+        return next()
+    }
+
+    const checkFollowUserId = function (req, res, next) {
+        let followUserId = req.body.followUserId
+
+		if (check.not.string(followUserId)) {
+			return res.status(404).json({
+				message: errorMessage.INVALID_QUERY_PARAMETER + ' (followUserId)'
+			})
+        }
+        
+        return next()
+    }
+
     const checkEmoji = function (req, res, next) {
         let emoji = req.body.emoji
 
@@ -286,6 +310,12 @@ module.exports = ({
                 })
             }
 
+            if (check.not.array(loc.coordinates)) {
+                return res.status(400).json({
+                    message: errorMessage.INVALID_POST_REQUEST + ' (loc.coordinates)'
+                })
+            }
+
             if (check.not.string(text)) {
                 return res.status(400).json({
                     message: errorMessage.INVALID_QUERY_PARAMETER + ' (text)'
@@ -309,6 +339,8 @@ module.exports = ({
             let img = req.file
             let text = req.body.text
 
+            //TODO coordinates 받기
+
             if (check.not.object(img)) {
                 return res.status(400).json({
                     message: errorMessage.INVALID_POST_REQUEST + ' (img)'
@@ -331,13 +363,11 @@ module.exports = ({
         let skip = req.query.skip
         let limit = req.query.limit
 
-        if (check.not.string(skip)) {
-            skip = 0
-        }
+        if (check.not.string(skip)) req.query.skip = 0
+        req.query.skip = parseInt(skip)
 
-        if (check.not.string(limit)) {
-            limit = 30
-        }
+        if (check.not.string(limit)) req.query.limit = 30
+        req.query.limit = parseInt(limit)
 
         return next()
     }
@@ -434,6 +464,8 @@ module.exports = ({
     }
 
     return {
+        checkUserId,
+        checkFollowUserId,
         checkEmojiAndMemo,
         checkEmoji,
         checkDuplicatedMemoAndUserid,

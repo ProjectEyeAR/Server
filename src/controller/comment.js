@@ -1,8 +1,6 @@
 module.exports = ({
-	db,
 	init,
 	logger,
-	check,
 	errorMessage
 }) => {
 	const {
@@ -16,15 +14,14 @@ module.exports = ({
 		checkSkipAndLimit,
 		checkIdParams,
 		checkEmoji
-	} = require('../middleware/typeCheck')({
+	} = require('../middleware/type_check')({
 		logger,
 		init
 	})
 
 	//@desc : 특정 메모에 속해있는 이모찌와 유저를 전부 가져옴
-	//@router : POST http://localhost:3001/api/comments/:id
-	//@params : id: String
-	//@query : skip: String, limit: String
+	//@api : POST http://localhost:3001/api/comments/:id
+	//@query : skip?, limit?
 	api.get('/:id', [checkIdParams, checkSkipAndLimit], async (req, res) => {
 		let memo = req.params.id
 		let skip = req.query.skip
@@ -32,12 +29,12 @@ module.exports = ({
 
 		try {
 			let comments = await Comment.find({})
-				.skip(parseInt(skip))
+				.skip(skip)
 				.where('memo')
 				.equals(memo)
 				.select('user emoji')
 				.populate('user')
-				.limit(parseInt(limit))
+				.limit(limit)
 				.sort('date')
 
 			return res.status(200).json({
@@ -53,7 +50,7 @@ module.exports = ({
 	})
 
 	//@desc : 코멘트 추가
-	//@router : POST http://localhost:3001/api/comments
+	//@api : POST http://localhost:3001/api/comments
 	//@body : id: String, emoji: String, memo: String
 	api.post('/', [checkLoggedIn, checkEmojiAndMemo, checkDuplicatedMemoAndUserid], async (req, res) => {
 		let myUserId = req.user._id
@@ -91,8 +88,7 @@ module.exports = ({
 	})
 
 	//@desc : 특정 메모의 자신의 코멘트 삭제
-	//@router: DELETE http://localhost:3001/api/comments/:id
-	//@params : id: String
+	//@api: DELETE http://localhost:3001/api/comments/:id
 	api.delete('/:id', [checkLoggedIn, checkIdParams], async (req, res) => {
 		let myUserId = req.user._id
 		let id = req.params.id
@@ -114,8 +110,7 @@ module.exports = ({
 	})
 
 	//@desc : 특정 메모의 자신의 특정 코멘트 수정
-	//@router: PUT http://localhost:3001/api/comments/:id
-	//@params : id: String
+	//@api: PUT http://localhost:3001/api/comments/:id
 	//@body : emoji: String
 	api.put('/:id', [checkLoggedIn, checkIdParams, checkEmoji], async (req, res) => {
 		let myUserId = req.user._id

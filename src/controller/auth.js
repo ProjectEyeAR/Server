@@ -14,6 +14,7 @@ module.exports = ({
   const Memo = require('../model/memo')
 
   //@desc : login 실패시 failureRedircet에 의해 작동되는 라우터
+  //@api : GET http://localhost:3001/api/auth/session/fail
   api.get('/session/fail', (req, res) => {
     if (req.flash)
       return res.status(400).json({
@@ -22,7 +23,7 @@ module.exports = ({
   })
 
   //@desc : 로컬 로그인
-  //@router : POST http://localhost:3001/api/auth/session
+  //@api : POST http://localhost:3001/api/auth/session
   //@body : email: String, password: String
   api.post('/session', passport.authenticate('local', {
     session: true,
@@ -30,14 +31,15 @@ module.exports = ({
     failureFlash: true
   }), async (req, res) => {
     let user = req.user
+    let userId = user._id
 
-    let followingQuery = { user: user._id }
+    let followingQuery = { user: userId }
     let followingCount = await Following.count(followingQuery)
 
-    let followerQuery = { followUser: user._id }
+    let followerQuery = { followUser: userId }
     let followerCount = await Following.count(followerQuery)
 
-    let memoCountQuery = { user: user._id }
+    let memoCountQuery = { user: userId }
     let memoCount = await Memo.count(memoCountQuery)
 
     user.set('followingCount', followingCount)
@@ -51,25 +53,31 @@ module.exports = ({
   })
 
   //@desc : 로컬 & 페이스북 로그아웃
-  //@router : GET http://localhost:3001/api/auth/session
+  //@api : GET http://localhost:3001/api/auth/session
   api.get('/session', (req, res) => {
+    req.session.destroy(err => {
+      console.log(err)
+    });  // 세션 삭제
+
     req.logout()
     res.status(200).json({})
   })
 
   //@desc : 페이스북 로그인
-  //@router : GET http://localhost:3001/api/auth/facebook
+  //@api : GET http://localhost:3001/api/auth/facebook
   api.get('/facebook', passport.authenticate('facebook', {
     scope: 'email'
   }))
 
   //@desc : 페이스북 로그인 실패, 성공시 거쳐가는 콜백 
+  //@api : GET http://localhost:3001/api/auth/facebook/callback'
   api.get('/facebook/callback', passport.authenticate('facebook', {
     successRedirect: '/api/users/me',
     failureRedirect: '/api/auth/facebook/fail'
   }))
 
   //@desc : 페이스북 로그인 실패
+  //@api : GET http://localhost:3001/api/auth/facebook/fail'
   api.get('/facebook/fail', (req, res) => {
     return res.status(500).json({
       message: errorMessage.FACEBOOK_LOGIN_FAIL

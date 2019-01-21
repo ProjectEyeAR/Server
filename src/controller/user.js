@@ -1,6 +1,5 @@
 module.exports = ({
 	init,
-	db,
 	logger,
 	check
 }) => {
@@ -21,15 +20,15 @@ module.exports = ({
 		checkDuplicatedDisplayName,
 		checkDuplicatedEmailAndDisplayName,
 		checkProfile
-	} = require('../middleware/typeCheck')({
+	} = require('../middleware/type_check')({
 		logger,
 		User,
 		init
 	})
 
 	//@desc : 로컬 회원가입
-	//@router: DELETE http://localhost:3001/api/users
-	//@body : email: String, password: String, displayName: String, img: Object
+	//@api: DELETE http://localhost:3001/api/users
+	//@body : email: String, password: String, displayName: String, img?: Object
 	api.post('/', [checkRegisterUser, checkDuplicatedEmailAndDisplayName], async (req, res) => {
 		let email = req.body.email
 		let password = req.body.password
@@ -81,9 +80,10 @@ module.exports = ({
 	})
 
 	//@desc : 자신의 유저 정보 가져오기
-	//@router : GET http://localhost:3001/api/users/me
+	//@api : GET http://localhost:3001/api/users/me
 	api.get('/me', checkLoggedIn, async (req, res) => {
-		let userId = req.query.userId
+		let userId = req.user._id
+		let user = req.user
 
 		try {
 			let followingQuery = { user: userId }
@@ -99,7 +99,8 @@ module.exports = ({
     		user.set('followerCount', followerCount)
     		user.set('memoCount', memoCount)
     		user.set('following', false)
-
+			user.set('session', req.session)
+			//TODO: expiry 넣기
 			return res.status(200).json({
 				data: user
 			})
@@ -110,14 +111,10 @@ module.exports = ({
 				message: err.message
 			})
 		}
-
-		res.status(401).json({
-			data: req.user
-		})
 	})
 
 	//@desc : 특정 유저 정보 가져오기
-	//@router : GET http://localhost:3001/api/users/:id
+	//@api : GET http://localhost:3001/api/users/:id
 	//@params : id: String
 	api.get('/:id', checkIdParams, async (req, res) => {
 		let id = req.params.id
@@ -159,7 +156,7 @@ module.exports = ({
 	})
 
 	//@desc : 자신의 계정을 삭제함
-	//@router : DELETE http://localhost:3001/api/users
+	//@api : DELETE http://localhost:3001/api/users
 	api.delete('/', checkLoggedIn, async (req, res) => {
 		let myUserId = req.user._id
 
@@ -179,7 +176,7 @@ module.exports = ({
 	})
 
 	//@desc : 자신의 이메일을 수정
-	//@router : PATCH http://localhost:3001/api/users/email
+	//@api : PATCH http://localhost:3001/api/users/email
 	//@body : email: String
 	api.patch('/email', [checkLoggedIn, checkRegisterUser, checkDuplicatedEmail], async (req, res) => {
 		let myUserId = req.user._id
@@ -212,7 +209,7 @@ module.exports = ({
 	})
 
 	//@desc : 자신의 비밀번호를 수정
-	//@router : POST http://localhost:3001/api/users/display_name
+	//@api : POST http://localhost:3001/api/users/display_name
 	//@body : displayName: String
 	api.post('/password', passport.authenticate('local', {
 		session: false,
@@ -261,7 +258,7 @@ module.exports = ({
 	})
 
 	//@desc : 자신의 DisplayName을 수정
-	//@router : PATCH http://localhost:3001/api/users/display_name
+	//@api : PATCH http://localhost:3001/api/users/display_name
 	//@body : displayName: String
 	api.patch('/display_name', [checkLoggedIn, checkRegisterUser, checkDuplicatedDisplayName], async (req, res) => {
 		let myUserId = req.user._id
@@ -294,7 +291,7 @@ module.exports = ({
 	})
 
 	//@desc : 자신의 프로필 사진을 수정
-	//@router : PATCH http://localhost:3001/api/users/profile
+	//@api : PATCH http://localhost:3001/api/users/profile
 	//@body : img: Object
 	api.patch('/profile', [checkLoggedIn, checkProfile], async (req, res) => {
 		let myUserId = req.user._id
@@ -340,7 +337,7 @@ module.exports = ({
 
 
 	//@desc : 자신의 프로필 사진 삭제
-	//@router : DELETE http://localhost:3001/api/users/profile
+	//@api : DELETE http://localhost:3001/api/users/profile
 	api.delete('/profile', checkLoggedIn, async (req, res) => {
 		let myUserId = req.user._id
 

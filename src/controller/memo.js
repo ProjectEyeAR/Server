@@ -1,6 +1,5 @@
 module.exports = ({
   init,
-  db,
   logger,
   check
 }) => {
@@ -23,14 +22,14 @@ module.exports = ({
     checkCity,
     checkTown,
     checkVillage
-  } = require('../middleware/typeCheck')({
+  } = require('../middleware/type_check')({
     logger,
     init
   })
   const axios = require('axios')
 
   //@desc : 주어진 tag가 속한 모든 메모를 출력함
-  //@router : GET http://localhost:3001/api/memos/findByTag
+  //@api : GET http://localhost:3001/api/memos/findByTag
   //@query : tag: String
   api.get('/tags', checkTag, async (req, res) => {
     let tag = req.query.tag
@@ -54,7 +53,7 @@ module.exports = ({
   })
 
   //@desc : 특정 유저에게 속한 모든 메모의 개수를 보여줌
-  //@router : GET http://localhost:3001/api/memos/:id/count
+  //@api : GET http://localhost:3001/api/memos/:id/count
   //@params : id: String
   api.get('/count', checkUserIdQuery, async (req, res) => {
     let id = req.query.userId
@@ -78,7 +77,7 @@ module.exports = ({
   })
 
   //@desc : 주어진 좌표에서 가까운 메모 최대 30개 반환, loc img address필드만 가져옴
-  //@router : GET http://localhost:3001/api/memos/near
+  //@api : GET http://localhost:3001/api/memos/near
   //@query : lng: String, lat: String, skip: String, limit: String
   api.get('/near', [checkSkipAndLimit, checkLngAndLat], async (req, res) => {
     let lng = req.query.lng
@@ -414,7 +413,7 @@ module.exports = ({
   })
 
   //@desc : 특정 유저에 속해있는 모든 메모 출력
-  //@router : GET http://localhost:3001/api/memos/:id
+  //@api : GET http://localhost:3001/api/memos/:id
   //@params : id: String
   //@query : skip: String, limit: String
   api.get('/', [checkSkipAndLimit, checkUserIdQuery], async (req, res) => {
@@ -444,8 +443,8 @@ module.exports = ({
   })
 
   //@desc : 자신에게 메모를 추가함
-  //@router : POST http://localhost:3001/api/memos
-  //@body : text: String, img: Object, tags: String, loc: Object [lng, lat]
+  //@api : POST http://localhost:3001/api/memos
+  //@body : text: String, img: Object, tags: String, loc: Object[lng, lat]
   api.post('/', [checkLoggedIn, checkMemo], async (req, res) => {
     let text = req.body.text
     let img = req.file
@@ -500,7 +499,7 @@ module.exports = ({
 
 
   //@desc : 자신의 모든 메모를 삭제함
-  //@router : DELETE http://localhost:3001/api/memos
+  //@api : DELETE http://localhost:3001/api/memos
   api.delete('/', checkLoggedIn, async (req, res) => {
     let myUserId = req.user._id
 
@@ -552,7 +551,7 @@ module.exports = ({
   })
 
   //@desc : 자신의 특정한 메모 한 개를 삭제함
-  //@router : DELETE http://localhost:3001/api/memos/:id
+  //@api : DELETE http://localhost:3001/api/memos/:id
   //@params : id: String
   api.delete('/:id', [checkLoggedIn, checkIdParams], async (req, res) => {
     let id = req.params.id
@@ -575,7 +574,7 @@ module.exports = ({
   })
 
   //@desc : 자신의 특정한 memo의 사진, 텍스트를 바꿈
-  //@router : PUT http://localhost:3001/api/memos/:id/TextAndImage
+  //@api : PUT http://localhost:3001/api/memos/:id/TextAndImage
   //@params : id: String
   //@body: img: Object, text: String
   api.put('/:id/TextAndImage', [checkLoggedIn, checkMemoTextAndImage, checkIdParams], async (req, res) => {
