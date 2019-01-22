@@ -334,7 +334,7 @@
 </tr>
 <tr>
 <td>자신의 특정한 memo의 사진, 텍스트를 바꿈</td>
-<td>POST</td>
+<td>PUT</td>
 <td>/api/memos/:id/TextAndImage</td>
 <td></td>
 <td>img: Object, text: String</td>
