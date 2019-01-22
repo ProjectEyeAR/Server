@@ -214,8 +214,8 @@
 <td></td>
 </tr>
 <tr>
-<td>특정 메모의 자신의 특정 코멘트 수정</td>
-<td>PUT</td>
+<td>특정 메모의 자신의 이모찌 수정</td>
+<td>PATCH</td>
 <td>/api/comments/:id</td>
 <td></td>
 <td>emoji: String</td>
