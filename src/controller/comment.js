@@ -109,16 +109,16 @@ module.exports = ({
 		}
 	})
 
-	//@desc : 특정 메모의 자신의 특정 코멘트 수정
-	//@api: PUT http://localhost:3001/api/comments/:id
+	//@desc : 특정 메모의 자신의 이모찌 수정
+	//@api: PATCH http://localhost:3001/api/comments/:id
 	//@body : emoji: String
-	api.put('/:id', [checkLoggedIn, checkIdParams, checkEmoji], async (req, res) => {
+	api.patch('/:id', [checkLoggedIn, checkIdParams, checkEmoji], async (req, res) => {
 		let myUserId = req.user._id
-		let memo = req.params.id
+		let memoId = req.params.id
 		let emoji = req.body.emoji
 
 		let filter = {
-			memo: memo,
+			memo: memoId,
 			user: myUserId
 		}
 		let update = {
