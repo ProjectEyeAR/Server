@@ -1,4 +1,4 @@
-<h1><a id="__Server_1"></a>서울시앱공모전  REST API Server </h1>
+<h1><a id="_RESTFUL_API_1"></a>서울시앱공모전 RESTFUL API</h1>
 <h2><a id="Steps_to_build_it_3"></a>Steps to build it</h2>
 <p><em>yarn dev</em> or <em>npm run dev</em></p>
 <h2><a id="Sample_7"></a>Sample</h2>
@@ -75,10 +75,21 @@
         &quot;displayName&quot;: &quot;example&quot;,
         &quot;date&quot;: &quot;2019-01-21T03:23:54.116Z&quot;,
         &quot;__v&quot;: 0,
-        &quot;followingCount&quot;: 0,
-        &quot;followerCount&quot;: 0,
-        &quot;memoCount&quot;: 0,
-        &quot;following&quot;: false
+        &quot;followingCount&quot;: 1,
+        &quot;followerCount&quot;: 1,
+        &quot;memoCount&quot;: 2,
+        &quot;following&quot;: false,
+        &quot;session&quot;: {
+            &quot;cookie&quot;: {
+                &quot;originalMaxAge&quot;: 2591963363,
+                &quot;expires&quot;: &quot;2019-02-21T08:41:32.252Z&quot;,
+                &quot;httpOnly&quot;: true,
+                &quot;path&quot;: &quot;/&quot;
+            },
+            &quot;passport&quot;: {
+                &quot;user&quot;: &quot;5c453b4abfc1103188c37124&quot;
+            }
+        }
     }
 }
 </code></pre>
@@ -125,9 +136,9 @@
     }
 }
 </code></pre>
-<h2><a id="Routers_137"></a>Routers</h2>
+<h2><a id="Routers_147"></a>Routers</h2>
 <hr>
-<h3><a id="Auth_139"></a>Auth</h3>
+<h3><a id="Auth_149"></a>Auth</h3>
 <table class="table table-striped table-bordered">
 <thead>
 <tr>
@@ -169,7 +180,7 @@
 </tr>
 </tbody>
 </table>
-<h3><a id="Comment_146"></a>Comments</h3>
+<h3><a id="Comment_156"></a>Comment</h3>
 <table class="table table-striped table-bordered">
 <thead>
 <tr>
@@ -211,7 +222,7 @@
 </tr>
 </tbody>
 </table>
-<h3><a id="Follwings_154"></a>Follwings</h3>
+<h3><a id="Follwings_164"></a>Follwings</h3>
 <table class="table table-striped table-bordered">
 <thead>
 <tr>
@@ -260,7 +271,7 @@
 </tr>
 </tbody>
 </table>
-<h3><a id="Memos_163"></a>Memos</h3>
+<h3><a id="Memos_173"></a>Memos</h3>
 <table class="table table-striped table-bordered">
 <thead>
 <tr>
@@ -330,7 +341,7 @@
 </tr>
 </tbody>
 </table>
-<h3><a id="Users_175"></a>Users</h3>
+<h3><a id="Users_185"></a>Users</h3>
 <table class="table table-striped table-bordered">
 <thead>
 <tr>
