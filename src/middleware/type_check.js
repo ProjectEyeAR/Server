@@ -100,6 +100,18 @@ module.exports = ({
         return next()
     }
 
+    const checkPassword = function (req, res, next) {
+        let password = req.body.password
+
+        if (check.not.string(password) || !PASSWORD_REGEX.test(password)) {
+            return res.status(400).json({
+                message: errorMessage.INVALID_POST_REQUEST + ' (password)'
+            })
+        }
+
+        return next()
+    }
+
     const checkRegisterUser = function (req, res, next) {
         single(req, res, function (err) {
             // if (err) {
@@ -464,6 +476,7 @@ module.exports = ({
     }
 
     return {
+        checkPassword,
         checkUserId,
         checkFollowUserId,
         checkEmojiAndMemo,

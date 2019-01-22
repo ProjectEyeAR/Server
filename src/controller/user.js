@@ -19,7 +19,8 @@ module.exports = ({
 		checkDuplicatedEmail,
 		checkDuplicatedDisplayName,
 		checkDuplicatedEmailAndDisplayName,
-		checkProfile
+		checkProfile,
+		checkPassword
 	} = require('../middleware/type_check')({
 		logger,
 		User,
@@ -115,7 +116,6 @@ module.exports = ({
 
 	//@desc : 특정 유저 정보 가져오기
 	//@api : GET http://localhost:3001/api/users/:id
-	//@params : id: String
 	api.get('/:id', checkIdParams, async (req, res) => {
 		let id = req.params.id
 
@@ -209,9 +209,9 @@ module.exports = ({
 	})
 
 	//@desc : 자신의 비밀번호를 수정
-	//@api : POST http://localhost:3001/api/users/display_name
-	//@body : displayName: String
-	api.post('/password', passport.authenticate('local', {
+	//@api : PATCH http://localhost:3001/api/users/password
+	//@body : newPassword: String
+	api.patch('/password', [checkPassword, passport.authenticate('local', {
 		session: false,
 	    failureRedirect: '/api/auth/session/fail',
 	    failureFlash: true
@@ -255,7 +255,7 @@ module.exports = ({
 				})
 			}
 		})
-	})
+	}])
 
 	//@desc : 자신의 DisplayName을 수정
 	//@api : PATCH http://localhost:3001/api/users/display_name

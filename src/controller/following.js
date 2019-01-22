@@ -18,7 +18,7 @@ module.exports = ({
 
 	//@desc : 자신이 특정 아이디를 following 추가
 	//@api: POST http://localhost:3001/api/followings/
-	//@body: followUserId
+	//@body: followUserId: String
 	api.post('/', [checkLoggedIn, checkFollowUserId], async (req, res) => {
 		let userId = req.user._id
 		let followUserId = req.body.followUserId
@@ -42,7 +42,7 @@ module.exports = ({
 
 	//@desc : 자신이 특정 아이디를 following 삭제
 	//@api: DELETE http://localhost:3001/api/followings/
-	//@body: followUserId
+	//@body: followUserId: String
 	api.delete('/', [checkLoggedIn, checkFollowUserId], async (req, res) => {
 		let userId = req.user._id
 		let followUserId = req.body.followUserId

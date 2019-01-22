@@ -30,7 +30,7 @@ module.exports = ({
 
   //@desc : 주어진 tag가 속한 모든 메모를 출력함
   //@api : GET http://localhost:3001/api/memos/findByTag
-  //@query : tag: String
+  //@query : tag
   api.get('/tags', checkTag, async (req, res) => {
     let tag = req.query.tag
 
@@ -53,8 +53,8 @@ module.exports = ({
   })
 
   //@desc : 특정 유저에게 속한 모든 메모의 개수를 보여줌
-  //@api : GET http://localhost:3001/api/memos/:id/count
-  //@params : id: String
+  //@api : GET http://localhost:3001/api/memos/count
+  //@query : id
   api.get('/count', checkUserIdQuery, async (req, res) => {
     let id = req.query.userId
 
@@ -78,7 +78,7 @@ module.exports = ({
 
   //@desc : 주어진 좌표에서 가까운 메모 최대 30개 반환, loc img address필드만 가져옴
   //@api : GET http://localhost:3001/api/memos/near
-  //@query : lng: String, lat: String, skip: String, limit: String
+  //@query : lng, lat, skip?, limit?
   api.get('/near', [checkSkipAndLimit, checkLngAndLat], async (req, res) => {
     let lng = req.query.lng
     let lat = req.query.lat
@@ -308,6 +308,32 @@ module.exports = ({
     }
   })
 
+  api.get('/county', checkCountry, async (req, res) => {
+    let state = req.query.country
+    let skip = req.query.skip
+    let limit = req.query.limit
+
+    try {
+      let memos = await Memo.find({})
+        .skip(skip)
+        .where('address.country')
+        .equals(state)
+        .populate('user')
+        .sort('date')
+        .limit(limit)
+
+      return res.status(200).json({
+        data: memos
+      })
+
+    } catch (err) {
+      logger.error(err.message)
+      return res.status(500).json({
+        message: err.message
+      })
+    }
+  })
+
   api.get('/state', checkState, async (req, res) => {
     let state = req.query.state
     let skip = req.query.skip
@@ -414,8 +440,7 @@ module.exports = ({
 
   //@desc : 특정 유저에 속해있는 모든 메모 출력
   //@api : GET http://localhost:3001/api/memos/:id
-  //@params : id: String
-  //@query : skip: String, limit: String
+  //@query : skip?, limit?
   api.get('/', [checkSkipAndLimit, checkUserIdQuery], async (req, res) => {
     let tagetUserId = req.query.userId
     let skip = req.query.skip
@@ -452,7 +477,7 @@ module.exports = ({
     let myUserId = req.user._id
     let tags = req.body.tags
     let address
-
+    
     await axios.get(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${loc.coordinates[1]}&lon=${loc.coordinates[0]}&email=${init.email}`)
       .then(res => {
         address = res.data.address
@@ -552,7 +577,6 @@ module.exports = ({
 
   //@desc : 자신의 특정한 메모 한 개를 삭제함
   //@api : DELETE http://localhost:3001/api/memos/:id
-  //@params : id: String
   api.delete('/:id', [checkLoggedIn, checkIdParams], async (req, res) => {
     let id = req.params.id
 
@@ -575,7 +599,6 @@ module.exports = ({
 
   //@desc : 자신의 특정한 memo의 사진, 텍스트를 바꿈
   //@api : PUT http://localhost:3001/api/memos/:id/TextAndImage
-  //@params : id: String
   //@body: img: Object, text: String
   api.put('/:id/TextAndImage', [checkLoggedIn, checkMemoTextAndImage, checkIdParams], async (req, res) => {
     let id = req.params.id

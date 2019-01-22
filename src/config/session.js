@@ -3,7 +3,7 @@ module.exports = ({
   init
 }) => {
   const Store = require('express-session').Store;
-  const MongooseStore = require('mongoose-express-session')(Store);
+  const MongooseStore = require('mongoose-express-session-beta')(Store);
   const mongoose = require('mongoose');
 
   const thirtyDaysToMillis = 30 * 86400 * 1000
