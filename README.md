@@ -107,7 +107,7 @@
       &quot;tags&quot;: &quot;#HanGang#River&quot;  
 }
 </code></pre>
-<p>Then, You’ll get this.</p>
+<p>Then, You’ll get</p>
 <pre><code>   {
     &quot;data&quot;: {
         &quot;img&quot;: &quot;https://seoul-image-server.s3.ap-northeast-2.amazonaws.com/1548044435968.png&quot;,
@@ -204,7 +204,7 @@
 <td>POST</td>
 <td>/api/comments</td>
 <td></td>
-<td>id: String, emoji: String, memo: String</td>
+<td> emoji: String, memo: String</td>
 </tr>
 <tr>
 <td>특정 메모의 자신의 코멘트 삭제</td>

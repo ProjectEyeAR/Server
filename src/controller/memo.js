@@ -31,7 +31,7 @@ module.exports = ({
   //@desc : 주어진 tag가 속한 모든 메모를 출력함
   //@api : GET http://localhost:3001/api/memos/findByTag
   //@query : tag
-  api.get('/tags', checkTag, async (req, res) => {
+  api.get('/findByTag', checkTag, async (req, res) => {
     let tag = req.query.tag
 
     try {
@@ -94,7 +94,7 @@ module.exports = ({
             type: 'Point',
             coordinates: [parseFloat(lng), parseFloat(lat)],
           },
-          maxDistance: 0.1 / 111.12,
+          // maxDistance: 0.1 / 111.12,
           spherical: true
         })
         .populate('user')

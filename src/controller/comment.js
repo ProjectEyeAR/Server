@@ -123,13 +123,14 @@ module.exports = ({
 		}
 		let update = {
 			$set: {
-				emoji: emoji,
+				emoji,
 				date: Date.now()
 			}
 		}
 		let option = {
 			new: true,
-			upsert: false
+			upsert: false,
+			returnNewDocument: true,
 		}
 
 		try {
