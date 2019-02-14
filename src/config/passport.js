@@ -69,7 +69,7 @@ module.exports = ({
     let type = 'facebook'
 
     let filter = {
-      email: email
+      email: profile.emails[0].value
     }
     let update = {
       $set: {
